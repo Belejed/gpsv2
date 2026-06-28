@@ -5996,8 +5996,10 @@
                   gpsSerialBaru: item.gpsSerialBaru,
                   gpsImeiBaru: item.gpsImeiBaru,
                   gpsSerialLama: item.gpsSerialLama,
+                  nomorSIM: '',
+                  provider: '',
+                  catatan: '',
                   gps: '', buzzer: '', sos: '', sensorWing: '', camera: '',
-                  statusSystem: '', statusSuspend: '',
                   updatedAt: ''
                 });
               }
@@ -6068,8 +6070,7 @@
             statusPlan: 'UNPLAN', statusPasang: 'BELUM DIPASANG',
             easygoDicopot: 'BELUM', modelGpsBaru: '',
             gps: '', buzzer: '', sos: '', sensorWing: '', camera: '',
-            statusSystem: '', statusSuspend: '', updatedAt: '',
-            gpsSerialLama: ''
+            updatedAt: '', gpsSerialLama: ''
           };
           syncUpdate(unit.nopol, {
             "PLAN PASANG": '', 
@@ -7985,16 +7986,17 @@
           "SENSOR WING": sensorWing,
           "CAMERA": camera,
           "SN GPS BARU": gpsSerialBaru,
-          "IMEI GPS BARU": "",
-          "NOMOR KARTU GPS BARU": "",
-          "PROVIDER SIM GPS BARU": "",
+          "IMEI GPS BARU": gpsImeiBaru,
+          "NOMOR KARTU GPS BARU": nomorSIM,
+          "PROVIDER SIM GPS BARU": provider,
           "FOTO KENDARAAN (NOPOL)": urlFotoKendaraan,
           "FOTO SERIAL GPS LAMA (DICABUT)": urlFotoGPSLama,
           "FOTO GPS BARU (SN TERLIHAT)": urlFotoGPSBaru,
           "FOTO HASIL INSTALASI": urlFotoHasilInstalasi,
           "FOTO ODOMETER": urlFotoOdometer,
           "SN GPS LAMA": noGpsLama,
-          "TEKNISI SUBMIT AT": ts
+          "TEKNISI SUBMIT AT": ts,
+          "catatanPasang": catatanPasang
         };
 
         try {
@@ -8006,10 +8008,12 @@
             fotoOdometer: urlFotoOdometer,
             gpsSerialLama: noGpsLama,
             gpsSerialBaru: gpsSerialBaru,
-            gpsImeiBaru: "",
+            gpsImeiBaru: gpsImeiBaru,
+            nomorSIM: nomorSIM,
+            provider: provider,
+            catatanPasang: catatanPasang,
             modelGpsBaru: modelGpsBaru,
             easygoDicopot: 'SUDAH',
-            statusSystem: 'BELUM DITEST',
             updatedAt: ts,
             teknisiSubmitAt: ts
           } : item));
@@ -12833,15 +12837,6 @@ function doPost(e) {
           if (updates[key] === undefined) continue;
           
           const normKey = key.trim().toUpperCase();
-          if (
-            normKey === 'IMEI GPS BARU' || normKey === 'GPS_IMEI_BARU' || normKey === 'GPSIMEIBARU' ||
-            normKey === 'NOMOR KARTU GPS BARU' || normKey === 'NOMOR_SIM' || normKey === 'NOMORSIM' ||
-            normKey === 'PROVIDER SIM GPS BARU' || normKey === 'PROVIDER' || normKey === 'PROVIDERSIM' ||
-            key === 'gpsImeiBaru' || key === 'nomorSIM' || key === 'provider'
-          ) {
-            continue;
-          }
-
           let col = key;
           if (normKey === 'OWNERSHIP') col = 'ownership';
           else if (normKey === 'NOPOL') col = 'nopol';
@@ -12886,8 +12881,10 @@ function doPost(e) {
           else if (normKey === 'CMT SUBMIT AT' || normKey === 'CMTSUBMITAT') col = 'cmtSubmitAt';
           else if (normKey === 'IT SUBMIT AT' || normKey === 'ITSUBMITAT') col = 'itSubmitAt';
           else if (normKey === 'FOTO ODOMETER' || normKey === 'FOTO_ODOMETER' || normKey === 'FOTOODOMETER') col = 'fotoOdometer';
-          else if (normKey === 'STATUS SYSTEM' || normKey === 'STATUS_SYSTEM' || normKey === 'STATUSSYSTEM') col = 'statusSystem';
-          else if (normKey === 'STATUS SUSPEND' || normKey === 'STATUS_SUSPEND' || normKey === 'STATUSSUSPEND') col = 'statusSuspend';
+          else if (normKey === 'IMEI GPS BARU' || normKey === 'GPS_IMEI_BARU' || normKey === 'GPSIMEIBARU' || normKey === 'GPSIMEIBARU') col = 'gpsImeiBaru';
+          else if (normKey === 'NOMOR KARTU GPS BARU' || normKey === 'NOMOR_SIM' || normKey === 'NOMORSIM' || normKey === 'NOMORSIM') col = 'nomorSIM';
+          else if (normKey === 'PROVIDER SIM GPS BARU' || normKey === 'PROVIDER' || normKey === 'PROVIDERSIM' || normKey === 'PROVIDERSIM') col = 'provider';
+          else if (normKey === 'CATATAN_PASANG' || normKey === 'CATATAN PASANG' || normKey === 'CATATAN') col = 'catatanPasang';
           else if (normKey === 'STATUSPLAN' || normKey === 'STATUS_PLAN' || normKey === 'STATUS PLAN') { /* statusPlan is computed, skip syncing */ continue; }
           
           mapped[col] = updates[key];
@@ -13056,7 +13053,6 @@ function doPost(e) {
                   statusPasang: 'BELUM DIPASANG',
                   modelGpsBaru: '',
                   gps: '', buzzer: '', sos: '', sensorWing: '',
-                  statusSystem: '', statusSuspend: '',
                   updatedAt: ''
                 })));
                 globalAddToast('Berjalan dalam Mode Offline (Demo)!', 'info');
