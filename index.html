@@ -5145,7 +5145,7 @@
               id: `${u.id}-plan`,
               nopol: u.nopol,
               unit: u,
-              user: 'Planner',
+              user: u.plannerUser || 'Planner',
               role: 'planner',
               activity: 'Rencana Pemasangan Dibuat',
               timestamp: u.planDate,
@@ -5190,7 +5190,7 @@
               id: `${u.id}-it`,
               nopol: u.nopol,
               unit: u,
-              user: 'IT Verifikator',
+              user: u.itUser || 'IT Verifikator',
               role: 'it',
               activity: 'Verifikasi Aplikasi IT Disetujui',
               timestamp: u.itSubmitAt,
@@ -5205,7 +5205,7 @@
               id: `${u.id}-cmt`,
               nopol: u.nopol,
               unit: u,
-              user: 'CMT Verifikator',
+              user: u.cmtUser || 'CMT Verifikator',
               role: 'cmt',
               activity: 'Verifikasi CMT Selesai',
               timestamp: u.cmtSubmitAt,
@@ -5251,17 +5251,40 @@
       const userStats = useMemo(() => {
         const stats = {};
         units.forEach(u => {
+          // 1. Planner
+          if (u.plannerUser) {
+            const name = u.plannerUser;
+            if (!stats[name]) stats[name] = { name, role: 'Planner', count: 0, lastActive: '' };
+            stats[name].count++;
+            if (u.planDate && u.planDate > stats[name].lastActive) stats[name].lastActive = u.planDate;
+          }
+          // 2. Teknisi
           if (u.teknisiPelaksana) {
             const name = u.teknisiPelaksana;
             if (!stats[name]) stats[name] = { name, role: 'Teknisi', count: 0, lastActive: '' };
             stats[name].count++;
-            if (u.teknisiSubmitAt > stats[name].lastActive) stats[name].lastActive = u.teknisiSubmitAt;
+            if (u.teknisiSubmitAt && u.teknisiSubmitAt > stats[name].lastActive) stats[name].lastActive = u.teknisiSubmitAt;
           }
+          // 3. PIC Lapangan
           if (u.picLapangan) {
             const name = u.picLapangan;
             if (!stats[name]) stats[name] = { name, role: 'PIC Lapangan', count: 0, lastActive: '' };
             stats[name].count++;
-            if (u.picSubmitAt > stats[name].lastActive) stats[name].lastActive = u.picSubmitAt;
+            if (u.picSubmitAt && u.picSubmitAt > stats[name].lastActive) stats[name].lastActive = u.picSubmitAt;
+          }
+          // 4. IT Verifikator
+          if (u.itUser) {
+            const name = u.itUser;
+            if (!stats[name]) stats[name] = { name, role: 'IT Verifikator', count: 0, lastActive: '' };
+            stats[name].count++;
+            if (u.itSubmitAt && u.itSubmitAt > stats[name].lastActive) stats[name].lastActive = u.itSubmitAt;
+          }
+          // 5. CMT Verifikator
+          if (u.cmtUser) {
+            const name = u.cmtUser;
+            if (!stats[name]) stats[name] = { name, role: 'CMT Verifikator', count: 0, lastActive: '' };
+            stats[name].count++;
+            if (u.cmtSubmitAt && u.cmtSubmitAt > stats[name].lastActive) stats[name].lastActive = u.cmtSubmitAt;
           }
         });
         return Object.values(stats).sort((a, b) => b.count - a.count);
@@ -5416,10 +5439,15 @@
                   {/* Section 1: Planner Schedule */}
                   <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
                     <div style={{ color: 'var(--color-plan)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>1. Jadwal Pemasangan (Planner)</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 4 }}>
                       <div>Tgl Rencana: <strong>{selectedUnit.planDate || '—'}</strong></div>
                       <div>Lokasi Pasang: <strong>{selectedUnit.lokasiPasang || '—'}</strong></div>
                     </div>
+                    {selectedUnit.plannerUser && (
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 4, fontSize: 10, color: 'var(--text-secondary)' }}>
+                        Jadwal dibuat oleh: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.plannerUser}</strong>
+                      </div>
+                    )}
                   </div>
 
                   {/* Section 2: Technician Details */}
@@ -5453,12 +5481,18 @@
                   {/* Section 4: IT & CMT Verifikasi */}
                   <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
                     <div style={{ color: '#8b5cf6', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>4. Verifikasi Akhir (IT & CMT)</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
                       <div>IT Submit: <strong>{selectedUnit.itSubmitAt || '—'}</strong></div>
                       <div>IT Cek App: <strong>{selectedUnit.itCekAplikasi || '—'}</strong></div>
                       <div>CMT Submit: <strong>{selectedUnit.cmtSubmitAt || '—'}</strong></div>
                       <div>CMT Cek App: <strong>{selectedUnit.cmtCekAplikasi || '—'}</strong></div>
                     </div>
+                    {(selectedUnit.itUser || selectedUnit.cmtUser) && (
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 6, fontSize: 10, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {selectedUnit.itUser && <div>Diverifikasi IT oleh: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.itUser}</strong></div>}
+                        {selectedUnit.cmtUser && <div>Diverifikasi CMT oleh: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.cmtUser}</strong></div>}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -6059,7 +6093,8 @@
             teknisiPelaksana: dataToSave.teknisiPelaksana || '',
             statusPlan: newStatusPlan,
             statusPasang: 'BELUM DIPASANG',
-            gpsSerialLama: dataToSave.gpsSerialLama || ''
+            gpsSerialLama: dataToSave.gpsSerialLama || '',
+            plannerUser: user.name || user.username
           };
           syncUpdate(unit.nopol, {
             "PLAN PASANG": dataToSave.planDate || '',
@@ -6067,7 +6102,8 @@
             "PIC LAPANGAN": dataToSave.picLapangan || '',
             "TEKNISI PELAKSANA": dataToSave.teknisiPelaksana || '',
             "STATUS REGISTRASI": 'BELUM DIPASANG',
-            "SN GPS LAMA": dataToSave.gpsSerialLama || ''
+            "SN GPS LAMA": dataToSave.gpsSerialLama || '',
+            "plannerUser": user.name || user.username
           });
         }
 
@@ -10397,6 +10433,7 @@
 
         // 4b. IT View
     function ITView({ units, setUnits, syncUpdate, isMobile }) {
+      const { user } = useContext(AuthContext);
       const [subTab, setSubTab] = useState('active'); // 'active' | 'history'
       const [q, setQ] = useState('');
       const [loc, setLoc] = useState('');
@@ -10593,7 +10630,8 @@
           "CEK UNIT DI APLIKASI (TEMON /GEOTAB / SMATRACK) - IT": itCekAplikasi,
           "FOTO INTEGRASI DATA GPS KE PUNINAR": urlItFotoIntegrasi,
           "FOTO INTEGRASI DATA ABNORMALITY KE PUNINAR": urlItFotoAbnormality,
-          "IT SUBMIT AT": ts
+          "IT SUBMIT AT": ts,
+          "itUser": user.name || user.username
         };
 
         try {
@@ -10605,7 +10643,8 @@
             itFotoIntegrasi: urlItFotoIntegrasi,
             itFotoAbnormality: urlItFotoAbnormality,
             updatedAt: ts,
-            itSubmitAt: ts
+            itSubmitAt: ts,
+            itUser: user.name || user.username
           } : u));
           setEditId(null);
           setItFotoIntegrasi('');
@@ -10920,6 +10959,7 @@
 
         // 4c. CMT View
     function CMTView({ units, setUnits, syncUpdate, isMobile }) {
+      const { user } = useContext(AuthContext);
       const [subTab, setSubTab] = useState('active'); // 'active' | 'history'
       const [q, setQ] = useState('');
       const [loc, setLoc] = useState('');
@@ -11120,7 +11160,8 @@
           "CEK UNIT DI APLIKASI (TEMON /GEOTAB / SMATRACK) - CMT": cmtCekAplikasi,
           "FOTO TERIMA FISIK GPS LAMA": urlCmtFotoTerimaFisik,
           "FOTO BUKTI TERMINASI GPS LAMA": urlCmtFotoSerahTerima,
-          "CMT SUBMIT AT": ts
+          "CMT SUBMIT AT": ts,
+          "cmtUser": user.name || user.username
         };
 
         try {
@@ -11133,7 +11174,8 @@
             cmtFotoTerimaFisik: urlCmtFotoTerimaFisik,
             cmtFotoTerminasi: urlCmtFotoSerahTerima,
             updatedAt: ts,
-            cmtSubmitAt: ts
+            cmtSubmitAt: ts,
+            cmtUser: user.name || user.username
           } : u));
           setEditId(null);
           setCmtFotoTerimaFisik('');
