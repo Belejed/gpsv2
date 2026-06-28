@@ -5136,7 +5136,7 @@
               role: 'teknisi',
               activity: 'Instalasi GPS Diserahkan',
               timestamp: u.teknisiSubmitAt,
-              details: `GPS Baru: ${u.modelGpsBaru || '—'} • Provider: ${u.provider || '—'}`,
+              details: `GPS Baru: ${u.modelGpsBaru || '—'}`,
               icon: 'bi-tools',
               color: 'var(--color-progress)'
             });
@@ -5429,7 +5429,6 @@
                       <div>Teknisi: <strong>{selectedUnit.teknisiPelaksana || '—'}</strong></div>
                       <div>Submit: <strong>{selectedUnit.teknisiSubmitAt || '—'}</strong></div>
                       <div>Model GPS Baru: <strong>{selectedUnit.modelGpsBaru || '—'}</strong></div>
-                      <div>Provider: <strong>{selectedUnit.provider || '—'}</strong></div>
                       <div>SN GPS Baru: <strong>{selectedUnit.gpsSerialBaru || '—'}</strong></div>
                     </div>
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 6, fontSize: 10 }}>
@@ -5664,7 +5663,7 @@
       const [showAddModal, setShowAddModal] = useState(false);
       const [newUnitData, setNewUnitData] = useState({
         nopol: '', ownership: 'PUNINAR', year: '', merk: '', assetType: '', location: LOCS[0], pool: POOLS[0], dedicate: 'LOGISTICS',
-        modelGpsBaru: 'GEOTAB', gpsSerialBaru: '', nomorSIM: '', gpsSerialLama: ''
+        modelGpsBaru: 'GEOTAB', gpsSerialBaru: '', gpsSerialLama: ''
       });
 
       const [isCustomOwnership, setIsCustomOwnership] = useState(false);
@@ -5960,11 +5959,8 @@
                   statusPasang: 'BELUM DIPASANG',
                   modelGpsBaru: item.modelGpsBaru || 'GEOTAB',
                   gpsSerialBaru: item.gpsSerialBaru,
-                  gpsImeiBaru: item.gpsImeiBaru,
                   gpsSerialLama: item.gpsSerialLama,
-                  nomorSIM: '',
-                  provider: '',
-                  catatan: '',
+                  catatanPasang: '',
                   gps: '', buzzer: '', sos: '', sensorWing: '', camera: '',
                   updatedAt: ''
                 });
@@ -6115,9 +6111,6 @@
           statusPasang: 'BELUM DIPASANG',
           modelGpsBaru: newUnitData.modelGpsBaru || 'GEOTAB',
           gpsSerialBaru: (newUnitData.gpsSerialBaru || '').trim(),
-          gpsImeiBaru: '',
-          nomorSIM: newUnitData.nomorSIM.trim(),
-          provider: '',
           gpsSerialLama: newUnitData.gpsSerialLama.trim(),
           gps: '', buzzer: '', sos: '', sensorWing: '', camera: '',
           statusSystem: '', statusSuspend: '',
@@ -6128,7 +6121,7 @@
         setShowAddModal(false);
         setNewUnitData({
           nopol: '', ownership: 'PUNINAR', year: '', merk: '', assetType: '', location: LOCS[0], pool: POOLS[0], dedicate: 'LOGISTICS',
-          modelGpsBaru: 'GEOTAB', gpsSerialBaru: '', nomorSIM: '', gpsSerialLama: ''
+          modelGpsBaru: 'GEOTAB', gpsSerialBaru: '', gpsSerialLama: ''
         });
 
         // Initialize all 39 columns correctly in spreadsheet for the new row
@@ -6889,10 +6882,6 @@
                       <i className="bi bi-check-circle"></i>
                       <span><strong>SN GPS BARU</strong> (cth: EG-12345)</span>
                     </div>
-                    <div className="import-instruction-item">
-                      <i className="bi bi-check-circle"></i>
-                      <span><strong>IMEI GPS BARU</strong> (cth: 351234567890123)</span>
-                    </div>
                   </div>
                   
                   <button type="button" className="btn btn-secondary btn-sm" onClick={downloadCSVTemplate} style={{ marginBottom: 16 }}>
@@ -7367,7 +7356,7 @@
 
       // Scanner states
       const [isScannerOpen, setIsScannerOpen] = useState(false);
-      const [activeScanField, setActiveScanField] = useState(''); // 'gpsLama', 'gpsBaru', 'gpsImei'
+      const [activeScanField, setActiveScanField] = useState(''); // 'gpsLama', 'gpsBaru'
 
       // Wizard step state
       const [activeStep, setActiveStep] = useState(1);
@@ -7455,7 +7444,7 @@
               fotoGPSLama,
               fotoGPSBaru,
               fotoHasilInstalasi,
-        fotoOdometer,
+              fotoOdometer,
               activeStep
             };
             localStorage.setItem('active_install_form_' + activeUnitId, JSON.stringify(stateToSave));
@@ -7500,9 +7489,6 @@
             if (savedData) {
               setNoGpsLama(String(savedData.noGpsLama ?? ''));
               setGpsSerialBaru(String(savedData.gpsSerialBaru ?? ''));
-              setGpsImeiBaru(String(savedData.gpsImeiBaru ?? ''));
-              setNomorSIM(String(savedData.nomorSIM ?? ''));
-              setProvider(String(savedData.provider ?? 'Telkomsel'));
               setCatatanPasang(String(savedData.catatanPasang ?? ''));
               
               setModelGpsBaru(String(savedData.modelGpsBaru ?? 'GEOTAB'));
@@ -7523,9 +7509,6 @@
             } else {
               setNoGpsLama(String(activeUnit.gpsSerialLama ?? ''));
               setGpsSerialBaru(String(activeUnit.gpsSerialBaru ?? ''));
-              setGpsImeiBaru(String(activeUnit.gpsImeiBaru ?? ''));
-              setNomorSIM(String(activeUnit.nomorSIM ?? ''));
-              setProvider(String(activeUnit.provider ?? 'Telkomsel'));
               setCatatanPasang(String(activeUnit.catatanPasang ?? ''));
               
               setModelGpsBaru(String(activeUnit.modelGpsBaru ?? 'GEOTAB'));
@@ -7777,7 +7760,7 @@
               if (fieldName === 'fotoGPSLama') setFotoGPSLama(originalBase64);
               if (fieldName === 'fotoGPSBaru') setFotoGPSBaru(originalBase64);
               if (fieldName === 'fotoHasilInstalasi') setFotoHasilInstalasi(originalBase64);
-            if (fieldName === 'fotoOdometer') setFotoOdometer(originalBase64);
+              if (fieldName === 'fotoOdometer') setFotoOdometer(originalBase64);
               globalAddToast('Foto berhasil ditambahkan (tanpa kompresi)!', 'success');
             }
           };
@@ -7809,7 +7792,6 @@
             const qrSuccess = (decodedText) => {
               if (fieldName === 'gpsLama') setNoGpsLama(decodedText);
               if (fieldName === 'gpsBaru') setGpsSerialBaru(decodedText);
-              if (fieldName === 'gpsImei') setGpsImeiBaru(decodedText);
               globalAddToast('Scan sukses: ' + decodedText, 'success');
               stopScanning();
             };
@@ -7852,7 +7834,6 @@
         const mockVal = "SN" + Math.floor(100000000 + Math.random() * 900000000);
         if (activeScanField === 'gpsLama') setNoGpsLama(mockVal);
         if (activeScanField === 'gpsBaru') setGpsSerialBaru(mockVal);
-        if (activeScanField === 'gpsImei') setGpsImeiBaru("IMEI" + Math.floor(100000000000000 + Math.random() * 90000000000000));
         
         globalAddToast('Simulasi scan barcode berhasil!', 'success');
         stopScanning();
