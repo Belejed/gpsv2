@@ -607,6 +607,16 @@
     .stat-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
+      cursor: pointer;
+    }
+    .pipeline-card {
+      transition: var(--transition);
+    }
+    .pipeline-card:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
     }
     .stat-label {
       font-size: 11px;
@@ -4675,34 +4685,76 @@
         return units.filter(u => u.updatedAt).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5);
       }, [units]);
 
+      const [activeDetailStep, setActiveDetailStep] = useState(null);
+      const [modalSearch, setModalSearch] = useState('');
+
+      const getFilteredUnits = (filterKey) => {
+        switch (filterKey) {
+          case 'total':
+            return units;
+          case 'planned':
+            return units.filter(u => u.planDate && (!u.statusPasang || u.statusPasang === 'BELUM DIPASANG'));
+          case 'unplanned':
+            return units.filter(u => !u.planDate && (!u.statusPasang || u.statusPasang === 'BELUM DIPASANG'));
+          case 'done':
+            return units.filter(u => u.statusPasang === 'DONE');
+          case 'pendingVerif':
+            return units.filter(u => ['TEKNISI SUBMITTED', 'PIC VERIFIED', 'PIC SUBMITTED', 'IT PENDING', 'IT VERIFIED', 'IT VERIFIKASI', 'CMT PENDING', 'IT DONE'].includes(u.statusPasang));
+          case 'progress':
+            return units.filter(u => u.statusPasang === 'ON PROGRESS');
+          case 'teknisiSubmitted':
+            return units.filter(u => u.statusPasang === 'TEKNISI SUBMITTED');
+          case 'picVerified':
+            return units.filter(u => ['PIC VERIFIED', 'PIC SUBMITTED'].includes(u.statusPasang));
+          case 'cmtPending':
+            return units.filter(u => ['IT PENDING', 'IT VERIFIED', 'IT VERIFIKASI', 'CMT PENDING', 'IT DONE'].includes(u.statusPasang));
+          default:
+            return [];
+        }
+      };
+
+      const filteredDetailUnits = useMemo(() => {
+        if (!activeDetailStep) return [];
+        const raw = getFilteredUnits(activeDetailStep.filterKey);
+        if (!modalSearch.trim()) return raw;
+        const q = modalSearch.toLowerCase().trim();
+        return raw.filter(u => 
+          (u.nopol && u.nopol.toLowerCase().includes(q)) || 
+          (u.pool && u.pool.toLowerCase().includes(q)) ||
+          (u.location && u.location.toLowerCase().includes(q)) ||
+          (u.picLapangan && u.picLapangan.toLowerCase().includes(q)) ||
+          (u.teknisiPelaksana && u.teknisiPelaksana.toLowerCase().includes(q))
+        );
+      }, [activeDetailStep, modalSearch, units]);
+
       return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="stat-grid">
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveDetailStep({ label: 'Total Unit', filterKey: 'total' }); setModalSearch(''); }}>
               <span className="stat-label">Total Unit</span>
               <span className="stat-value">{stats.total}</span>
               <span className="stat-sub">GPS Migration</span>
               <div className="stat-indicator" style={{background: 'var(--accent)'}} />
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveDetailStep({ label: 'Terjadwal (Plan)', filterKey: 'planned' }); setModalSearch(''); }}>
               <span className="stat-label">Terjadwal (Plan)</span>
               <span className="stat-value" style={{color: 'var(--color-plan)'}}>{stats.total - stats.unplanned}</span>
               <span className="stat-sub">{stats.total ? Math.round((stats.total - stats.unplanned)/stats.total*100) : 0}% ter-plan</span>
               <div className="stat-indicator" style={{background: 'var(--color-plan)'}} />
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveDetailStep({ label: 'Belum Plan', filterKey: 'unplanned' }); setModalSearch(''); }}>
               <span className="stat-label">Belum Plan</span>
               <span className="stat-value" style={{color: 'var(--color-unplan)'}}>{stats.unplanned}</span>
               <span className="stat-sub">Menunggu jadwal</span>
               <div className="stat-indicator" style={{background: 'var(--color-unplan)'}} />
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveDetailStep({ label: 'Selesai (Done)', filterKey: 'done' }); setModalSearch(''); }}>
               <span className="stat-label">Selesai (Done)</span>
               <span className="stat-value" style={{color: 'var(--color-done)'}}>{stats.done}</span>
               <span className="stat-sub">{pct}% Migrasi Selesai</span>
               <div className="stat-indicator" style={{background: 'var(--color-done)'}} />
             </div>
-            <div className="stat-card">
+            <div className="stat-card" onClick={() => { setActiveDetailStep({ label: 'Pending Verifikasi', filterKey: 'pendingVerif' }); setModalSearch(''); }}>
               <span className="stat-label">Pending Verifikasi</span>
               <span className="stat-value" style={{color: 'var(--color-delay)'}}>{stats.pendingVerif}</span>
               <span className="stat-sub">PIC, IT, dan CMT</span>
@@ -4826,24 +4878,29 @@
               marginTop: 10
             }}>
               {[
-                { label: 'Unplanned', val: stats.unplanned, color: 'var(--color-unplan)' },
-                { label: 'Planned', val: stats.planned, color: 'var(--color-plan)' },
-                { label: 'Installing', val: stats.progress, color: 'var(--color-progress)' },
-                { label: 'Pending PIC', val: stats.teknisiSubmitted, color: 'var(--color-delay)' },
-                { label: 'Pending IT', val: stats.picVerified, color: '#8b5cf6' },
-                { label: 'Pending CMT', val: stats.itPending + stats.itVerified + stats.cmtPending, color: '#ec4899' },
-                { label: 'Complete', val: stats.done, color: 'var(--color-done)' }
+                { label: 'Unplanned', val: stats.unplanned, color: 'var(--color-unplan)', filterKey: 'unplanned' },
+                { label: 'Planned', val: stats.planned, color: 'var(--color-plan)', filterKey: 'planned' },
+                { label: 'Installing', val: stats.progress, color: 'var(--color-progress)', filterKey: 'progress' },
+                { label: 'Pending PIC', val: stats.teknisiSubmitted, color: 'var(--color-delay)', filterKey: 'teknisiSubmitted' },
+                { label: 'Pending IT', val: stats.picVerified, color: '#8b5cf6', filterKey: 'picVerified' },
+                { label: 'Pending CMT', val: stats.itPending + stats.itVerified + stats.cmtPending, color: '#ec4899', filterKey: 'cmtPending' },
+                { label: 'Complete', val: stats.done, color: 'var(--color-done)', filterKey: 'done' }
               ].map((step, idx) => (
-                <div key={idx} style={{
-                  flex: 1, 
-                  minWidth: 90, 
-                  background: 'rgba(255,255,255,0.02)', 
-                  border: '1px solid var(--border-color)', 
-                  borderRadius: 'var(--radius-sm)', 
-                  padding: '10px 6px', 
-                  textAlign: 'center',
-                  position: 'relative'
-                }}>
+                <div key={idx} 
+                  className="pipeline-card"
+                  onClick={() => { setActiveDetailStep({ label: step.label, filterKey: step.filterKey }); setModalSearch(''); }}
+                  style={{
+                    flex: 1, 
+                    minWidth: 90, 
+                    background: 'rgba(255,255,255,0.02)', 
+                    border: '1px solid var(--border-color)', 
+                    borderRadius: 'var(--radius-sm)', 
+                    padding: '10px 6px', 
+                    textAlign: 'center',
+                    position: 'relative',
+                    cursor: 'pointer'
+                  }}
+                >
                   <div style={{fontSize: 18, fontWeight: 800, color: step.color}}>{step.val}</div>
                   <div style={{fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600, marginTop: 4}}>{step.label}</div>
                   {idx < 6 && !isMobile && (
@@ -4966,6 +5023,97 @@
               </div>
             )}
           </div>
+
+          {/* Details Modal when clicking any dashboard status box */}
+          {activeDetailStep !== null && (
+            <div className="modal-overlay" onClick={() => setActiveDetailStep(null)}>
+              <div className="modal-card" style={{ maxWidth: 850, width: '95%' }} onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <span className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <i className="bi bi-list-ul"></i> Detail Unit — {activeDetailStep.label} ({filteredDetailUnits.length})
+                  </span>
+                  <button className="modal-close" onClick={() => setActiveDetailStep(null)}><i className="bi bi-x"></i></button>
+                </div>
+                
+                {/* Search box inside modal */}
+                <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.01)' }}>
+                  <div style={{ position: 'relative', width: '100%' }}>
+                    <i className="bi bi-search" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', fontSize: 13 }}></i>
+                    <input 
+                      type="text" 
+                      value={modalSearch} 
+                      onChange={e => setModalSearch(e.target.value)} 
+                      placeholder="Cari nopol, pool, lokasi, teknisi, atau PIC..." 
+                      className="input-field" 
+                      style={{ paddingLeft: 36, height: 38, fontSize: 13, width: '100%', margin: 0, boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto', padding: 0 }}>
+                  <div className="table-container" style={{ boxShadow: 'none', border: 'none', margin: 0 }}>
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: 40 }}>#</th>
+                          <th>NOPOL / KENDARAAN</th>
+                          <th>TANGGAL PLAN</th>
+                          <th>TEKNISI & PIC</th>
+                          <th>STATUS DETAIL</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredDetailUnits.map((u, idx) => (
+                          <tr key={u.id}>
+                            <td className="text-muted">{idx + 1}</td>
+                            <td>
+                              <strong>{u.nopol}</strong>
+                              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>
+                                {u.merk} {u.year ? `(${u.year})` : ''} • {u.pool} • Site {u.location}
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ fontSize: 12, fontWeight: u.planDate ? 600 : 400, color: u.planDate ? 'var(--color-plan)' : 'var(--text-tertiary)' }}>
+                                {u.planDate || 'Belum Terjadwal'}
+                              </div>
+                              {u.updatedAt && (
+                                <div style={{ fontSize: 9, color: 'var(--text-tertiary)', marginTop: 2 }}>
+                                  Update: {u.updatedAt}
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <div style={{ fontSize: 12 }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>Teknisi: </span>
+                                <strong>{u.teknisiPelaksana || '—'}</strong>
+                              </div>
+                              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>
+                                <span style={{ color: 'var(--text-tertiary)' }}>PIC Lapangan: </span>
+                                <strong>{u.picLapangan || '—'}</strong>
+                              </div>
+                            </td>
+                            <td>
+                              <Badge val={u.statusPasang} />
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredDetailUnits.length === 0 && (
+                          <tr>
+                            <td colSpan="5" style={{ textAlign: 'center', padding: 32, color: 'var(--text-tertiary)' }}>
+                              Tidak ada unit yang sesuai pencarian
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setActiveDetailStep(null)}>Tutup</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
