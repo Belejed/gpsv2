@@ -12885,6 +12885,20 @@ function doPost(e) {
               {loadingLogin ? 'Memverifikasi...' : 'Masuk Aplikasi'}
             </button>
 
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              onClick={() => {
+                const cur = document.documentElement.getAttribute('data-theme');
+                const next = cur === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+              }}
+              style={{ width: '100%', marginTop: 12, justifyContent: 'center', height: 40 }}
+            >
+              <i className="bi bi-brightness-medium"></i> Ganti Tema
+            </button>
+
 
             
             <div style={{marginTop: 24, fontSize: 10, color: 'var(--text-tertiary)', textAlign: 'center'}}>
