@@ -5129,6 +5129,348 @@
       );
     }
 
+    // 1.5. Monitor Pekerjaan View
+    function MonitorPekerjaanView({ units, isMobile }) {
+      const [filterUser, setFilterUser] = useState('');
+      const [filterRole, setFilterRole] = useState('');
+      const [selectedUnit, setSelectedUnit] = useState(null);
+
+      // Generate all activity events chronologically
+      const allEvents = useMemo(() => {
+        const events = [];
+        units.forEach(u => {
+          // 1. Plan created
+          if (u.planDate) {
+            events.push({
+              id: `${u.id}-plan`,
+              nopol: u.nopol,
+              unit: u,
+              user: 'Planner',
+              role: 'planner',
+              activity: 'Rencana Pemasangan Dibuat',
+              timestamp: u.planDate,
+              details: `Lokasi: ${u.lokasiPasang || '—'}`,
+              icon: 'bi-calendar-event',
+              color: 'var(--color-plan)'
+            });
+          }
+          // 2. Technician submit
+          if (u.teknisiPelaksana && u.teknisiSubmitAt) {
+            events.push({
+              id: `${u.id}-teknisi`,
+              nopol: u.nopol,
+              unit: u,
+              user: u.teknisiPelaksana,
+              role: 'teknisi',
+              activity: 'Instalasi GPS Diserahkan',
+              timestamp: u.teknisiSubmitAt,
+              details: `GPS Baru: ${u.modelGpsBaru || '—'} • Provider: ${u.provider || '—'}`,
+              icon: 'bi-tools',
+              color: 'var(--color-progress)'
+            });
+          }
+          // 3. PIC submit
+          if (u.picLapangan && u.picSubmitAt) {
+            events.push({
+              id: `${u.id}-pic`,
+              nopol: u.nopol,
+              unit: u,
+              user: u.picLapangan,
+              role: 'pic',
+              activity: 'Verifikasi Lapangan Disubmit',
+              timestamp: u.picSubmitAt,
+              details: `Fisik Lama: ${u.picCekFisikLama || '—'} • Fisik Baru: ${u.picCekFisikBaru || '—'}`,
+              icon: 'bi-clipboard-check',
+              color: 'var(--color-delay)'
+            });
+          }
+          // 4. IT submit
+          if (u.itSubmitAt) {
+            events.push({
+              id: `${u.id}-it`,
+              nopol: u.nopol,
+              unit: u,
+              user: 'IT Verifikator',
+              role: 'it',
+              activity: 'Verifikasi Aplikasi IT Disetujui',
+              timestamp: u.itSubmitAt,
+              details: `Cek App: ${u.itCekAplikasi || '—'}`,
+              icon: 'bi-laptop',
+              color: '#8b5cf6'
+            });
+          }
+          // 5. CMT submit
+          if (u.cmtSubmitAt) {
+            events.push({
+              id: `${u.id}-cmt`,
+              nopol: u.nopol,
+              unit: u,
+              user: 'CMT Verifikator',
+              role: 'cmt',
+              activity: 'Verifikasi CMT Selesai',
+              timestamp: u.cmtSubmitAt,
+              details: `Status: ${u.statusPasang}`,
+              icon: 'bi-check-circle-fill',
+              color: 'var(--color-done)'
+            });
+          }
+        });
+
+        // Helper to parse date string for sorting
+        const parseTimestamp = (ts) => {
+          if (!ts) return 0;
+          const parts = ts.split(' ');
+          const dateParts = parts[0].split('-');
+          if (dateParts.length < 3) return 0;
+          const day = parseInt(dateParts[0], 10);
+          const month = parseInt(dateParts[1], 10) - 1;
+          const year = parseInt(dateParts[2], 10);
+          let hour = 0, min = 0, sec = 0;
+          if (parts[1]) {
+            const timeParts = parts[1].split(':');
+            hour = parseInt(timeParts[0], 10);
+            min = parseInt(timeParts[1], 10);
+            if (timeParts[2]) sec = parseInt(timeParts[2], 10);
+          }
+          return new Date(year, month, day, hour, min, sec).getTime();
+        };
+
+        return events.sort((a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+      }, [units]);
+
+      // Filtered events
+      const filteredEvents = useMemo(() => {
+        return allEvents.filter(ev => {
+          const matchUser = !filterUser || ev.user.toLowerCase().includes(filterUser.toLowerCase());
+          const matchRole = !filterRole || ev.role === filterRole;
+          return matchUser && matchRole;
+        });
+      }, [allEvents, filterUser, filterRole]);
+
+      // User performance / progress stats
+      const userStats = useMemo(() => {
+        const stats = {};
+        units.forEach(u => {
+          if (u.teknisiPelaksana) {
+            const name = u.teknisiPelaksana;
+            if (!stats[name]) stats[name] = { name, role: 'Teknisi', count: 0, lastActive: '' };
+            stats[name].count++;
+            if (u.teknisiSubmitAt > stats[name].lastActive) stats[name].lastActive = u.teknisiSubmitAt;
+          }
+          if (u.picLapangan) {
+            const name = u.picLapangan;
+            if (!stats[name]) stats[name] = { name, role: 'PIC Lapangan', count: 0, lastActive: '' };
+            stats[name].count++;
+            if (u.picSubmitAt > stats[name].lastActive) stats[name].lastActive = u.picSubmitAt;
+          }
+        });
+        return Object.values(stats).sort((a, b) => b.count - a.count);
+      }, [units]);
+
+      return (
+        <div className="fade-in" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 20 }}>
+          {/* LEFT SIDE: User Activity Overview */}
+          <div style={{ flex: isMobile ? 'none' : '1 1 300px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="panel-card">
+              <div className="panel-title"><i className="bi bi-people"></i> Keaktifan User (Realtime)</div>
+              <div className="table-container" style={{ boxShadow: 'none', border: 'none', margin: 0 }}>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>USER / ROLE</th>
+                      <th style={{ textAlign: 'center' }}>UNIT</th>
+                      <th>AKTIVITAS TERAKHIR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userStats.map((u, i) => (
+                      <tr key={i}>
+                        <td>
+                          <strong>{u.name}</strong>
+                          <div style={{ fontSize: 9, color: 'var(--text-secondary)', marginTop: 2 }}>{u.role}</div>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span className="unit-count-tag" style={{ background: 'var(--accent-dim)', color: 'var(--accent)' }}>{u.count}</span>
+                        </td>
+                        <td className="text-muted" style={{ fontSize: 10 }}>{u.lastActive || '—'}</td>
+                      </tr>
+                    ))}
+                    {userStats.length === 0 && (
+                      <tr>
+                        <td colSpan="3" style={{ textAlign: 'center', padding: 20, color: 'var(--text-tertiary)' }}>Belum ada aktivitas terekam</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE: Realtime Timeline */}
+          <div style={{ flex: isMobile ? 'none' : '2 2 500px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="panel-card">
+              <div className="panel-title"><i className="bi bi-activity"></i> Log Aktivitas Kerja (Live Feed)</div>
+              
+              <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+                <input 
+                  type="text" 
+                  value={filterUser} 
+                  onChange={e => setFilterUser(e.target.value)} 
+                  placeholder="Cari user..." 
+                  className="input-field" 
+                  style={{ flex: 1, minWidth: 150, margin: 0 }}
+                />
+                <select 
+                  value={filterRole} 
+                  onChange={e => setFilterRole(e.target.value)} 
+                  className="filter-select"
+                  style={{ width: 150 }}
+                >
+                  <option value="">Semua Peran</option>
+                  <option value="planner">Planner</option>
+                  <option value="teknisi">Teknisi</option>
+                  <option value="pic">PIC Lapangan</option>
+                  <option value="it">Verifikasi IT</option>
+                  <option value="cmt">Verifikasi CMT</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '600px', overflowY: 'auto', paddingRight: 6 }}>
+                {filteredEvents.map((ev, i) => (
+                  <div 
+                    key={ev.id} 
+                    onClick={() => setSelectedUnit(ev.unit)}
+                    style={{ 
+                      display: 'flex', 
+                      gap: 12, 
+                      padding: 12, 
+                      background: 'rgba(255,255,255,0.01)', 
+                      border: '1px solid var(--border-color)', 
+                      borderRadius: 'var(--radius-sm)', 
+                      cursor: 'pointer',
+                      transition: 'var(--transition)'
+                    }}
+                    className="pipeline-card"
+                  >
+                    <div style={{ 
+                      width: 32, 
+                      height: 32, 
+                      borderRadius: '50%', 
+                      background: 'rgba(255,255,255,0.03)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      color: ev.color,
+                      fontSize: 14,
+                      flexShrink: 0
+                    }}>
+                      <i className={`bi ${ev.icon}`}></i>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{ev.activity} — {ev.nopol}</span>
+                        <span style={{ fontSize: 9, color: 'var(--text-tertiary)', fontWeight: 600 }}>{ev.timestamp}</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                        User: <strong style={{ color: 'var(--text-primary)' }}>{ev.user}</strong> ({ev.role.toUpperCase()})
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-tertiary)', marginTop: 4 }}>
+                        {ev.details}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {filteredEvents.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Belum ada log aktivitas kerja</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* UNIT AUDIT REVIEW MODAL */}
+          {selectedUnit && (
+            <div className="modal-overlay detail-modal-overlay" onClick={() => setSelectedUnit(null)}>
+              <div className="modal-card detail-modal-card" style={{ maxWidth: 650, width: '95%' }} onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <span className="modal-title">
+                    <i className="bi bi-search" style={{ marginRight: 6, color: 'var(--accent)' }}></i>
+                    Audit Detail Pekerjaan: {selectedUnit.nopol}
+                  </span>
+                  <button className="modal-close" onClick={() => setSelectedUnit(null)}><i className="bi bi-x"></i></button>
+                </div>
+                
+                <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Status Akhir:</span>
+                    <Badge val={selectedUnit.statusPasang} />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
+                    <div>Nopol: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.nopol}</strong></div>
+                    <div>Tipe: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.merk || '—'} {selectedUnit.assetType || '—'}</strong></div>
+                    <div>Site: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.location || '—'}</strong></div>
+                    <div>Pool: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.pool || '—'}</strong></div>
+                    <div style={{ gridColumn: 'span 2' }}>Last Update: <strong style={{ color: 'var(--text-primary)' }}>{selectedUnit.updatedAt || '—'}</strong></div>
+                  </div>
+
+                  {/* Section 1: Planner Schedule */}
+                  <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
+                    <div style={{ color: 'var(--color-plan)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>1. Jadwal Pemasangan (Planner)</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <div>Tgl Rencana: <strong>{selectedUnit.planDate || '—'}</strong></div>
+                      <div>Lokasi Pasang: <strong>{selectedUnit.lokasiPasang || '—'}</strong></div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Technician Details */}
+                  <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
+                    <div style={{ color: 'var(--color-progress)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>2. Pelaksanaan Pemasangan (Teknisi)</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
+                      <div>Teknisi: <strong>{selectedUnit.teknisiPelaksana || '—'}</strong></div>
+                      <div>Submit: <strong>{selectedUnit.teknisiSubmitAt || '—'}</strong></div>
+                      <div>Model GPS Baru: <strong>{selectedUnit.modelGpsBaru || '—'}</strong></div>
+                      <div>Provider: <strong>{selectedUnit.provider || '—'}</strong></div>
+                      <div>SN GPS Baru: <strong>{selectedUnit.gpsSerialBaru || '—'}</strong></div>
+                      <div>IMEI GPS Baru: <strong>{selectedUnit.gpsImeiBaru || '—'}</strong></div>
+                    </div>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 6, fontSize: 10 }}>
+                      <strong>Fitur Test:</strong> GPS: {selectedUnit.gps || '—'} • Buzzer: {selectedUnit.buzzer || '—'} • SOS: {selectedUnit.sos || '—'} • Sensor Wing: {selectedUnit.sensorWing || '—'} • Camera: {selectedUnit.camera || '—'}
+                    </div>
+                  </div>
+
+                  {/* Section 3: PIC Verifikasi */}
+                  <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
+                    <div style={{ color: 'var(--color-delay)', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>3. Verifikasi Lapangan (PIC Lapangan)</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
+                      <div>PIC Lapangan: <strong>{selectedUnit.picLapangan || '—'}</strong></div>
+                      <div>Submit: <strong>{selectedUnit.picSubmitAt || '—'}</strong></div>
+                    </div>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 6, fontSize: 10 }}>
+                      <strong>Cek Fisik:</strong> Cek Lama: {selectedUnit.picCekFisikLama || '—'} • Cek Baru: {selectedUnit.picCekFisikBaru || '—'} • Cek Selesai: {selectedUnit.picCekKondisiSelesai || '—'} • Cek Fitur: {selectedUnit.picCekFitur || '—'}
+                    </div>
+                  </div>
+
+                  {/* Section 4: IT & CMT Verifikasi */}
+                  <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 11 }}>
+                    <div style={{ color: '#8b5cf6', fontWeight: 700, fontSize: 10, textTransform: 'uppercase', marginBottom: 6 }}>4. Verifikasi Akhir (IT & CMT)</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <div>IT Submit: <strong>{selectedUnit.itSubmitAt || '—'}</strong></div>
+                      <div>IT Cek App: <strong>{selectedUnit.itCekAplikasi || '—'}</strong></div>
+                      <div>CMT Submit: <strong>{selectedUnit.cmtSubmitAt || '—'}</strong></div>
+                      <div>CMT Cek App: <strong>{selectedUnit.cmtCekAplikasi || '—'}</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setSelectedUnit(null)}>Tutup</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // 2. Planner View
         function PlannerView({ units, setUnits, syncUpdate, isMobile }) {
       const { user, users } = useContext(AuthContext);
@@ -5865,12 +6207,16 @@
               <option value="UNPLAN">UNPLAN</option>
               <option value="DONE">DONE</option>
             </select>
-            <button className="btn btn-primary" onClick={() => setShowAddModal(true)} title="Tambah Unit Baru">
-              <i className="bi bi-plus"></i> Tambah Unit
-            </button>
-            <button className="btn btn-secondary" onClick={() => setShowImportModal(true)} title="Impor Massal dari CSV">
-              <i className="bi bi-upload"></i> Impor CSV
-            </button>
+            {user.role !== 'admin' && (
+              <>
+                <button className="btn btn-primary" onClick={() => setShowAddModal(true)} title="Tambah Unit Baru">
+                  <i className="bi bi-plus"></i> Tambah Unit
+                </button>
+                <button className="btn btn-secondary" onClick={() => setShowImportModal(true)} title="Impor Massal dari CSV">
+                  <i className="bi bi-upload"></i> Impor CSV
+                </button>
+              </>
+            )}
             <button className="btn btn-secondary" onClick={() => exportToCSV(sortedFiltered, 'rekap_gps_planner_filtered.csv')} title="Ekspor ke CSV">
               <i className="bi bi-download"></i> Ekspor CSV
             </button>
@@ -6352,12 +6698,12 @@
                       </div>
                     </div>
 
-                    {['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) && user.role !== 'admin' ? (
+                    {['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) || user.role === 'admin' ? (
                       <div className="input-group">
                         <label className="input-label">Tanggal Rencana Pemasangan</label>
                         <div className="input-field" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
                           <i className="bi bi-lock-fill" style={{ fontSize: 11 }}></i>
-                          {editData.planDate || '—'} <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>(Terkunci - sudah diklaim teknisi)</span>
+                          {editData.planDate || '—'} <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>{user.role === 'admin' ? '(Akses Hanya Lihat)' : '(Terkunci - sudah diklaim teknisi)'}</span>
                         </div>
                       </div>
                     ) : (
@@ -6373,12 +6719,12 @@
                       </div>
                     )}
 
-                    {['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) && user.role !== 'admin' ? (
+                    {['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) || user.role === 'admin' ? (
                       <div className="input-group">
                         <label className="input-label">Pool Pemasangan (Lokasi Pasang)</label>
                         <div className="input-field" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
                           <i className="bi bi-lock-fill" style={{ fontSize: 11 }}></i>
-                          {editData.lokasiPasang || '—'} <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>(Terkunci)</span>
+                          {editData.lokasiPasang || '—'} <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>{user.role === 'admin' ? '(Akses Hanya Lihat)' : '(Terkunci)'}</span>
                         </div>
                       </div>
                     ) : (
@@ -6407,7 +6753,7 @@
                   <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={() => setSelectedUnit(null)}>Batal</button>
                     {/* Hapus Jadwal hanya muncul jika belum diklaim teknisi ATAU jika user adalah admin */}
-                    {selectedUnit.planDate && (user.role === 'admin' || !['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang)) && (
+                    {selectedUnit.planDate && (user.role !== 'admin' && !['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang)) && (
                       <button 
                         type="button" 
                         className="btn btn-danger" 
@@ -6471,13 +6817,13 @@
                         <i className="bi bi-file-pdf" style={{ color: '#DC3545' }}></i> Unduh PDF
                       </button>
                     )}
-                    {/* Simpan hanya aktif jika belum diklaim ATAU jika user adalah admin */}
-                    {!['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) || user.role === 'admin' ? (
+                    {/* Simpan hanya aktif jika belum diklaim DAN bukan admin */}
+                    {!['ON PROGRESS', 'TEKNISI SUBMITTED', 'PIC SUBMITTED', 'IT DONE', 'DONE'].includes(selectedUnit.statusPasang) && user.role !== 'admin' ? (
                       <button type="submit" className="btn btn-primary">Simpan Jadwal</button>
                     ) : (
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)', padding: '0 8px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, height: 36 }}>
                         <i className="bi bi-lock-fill" style={{ fontSize: 11 }}></i>
-                        Jadwal dikunci — sudah diklaim
+                        {user.role === 'admin' ? 'Akses Hanya Lihat (View Only)' : 'Jadwal dikunci — sudah diklaim'}
                       </div>
                     )}
                   </div>
@@ -12595,12 +12941,13 @@ function doPost(e) {
       const tabs = useMemo(() => {
         const items = [
           { id: 'dashboard', label: 'Dashboard', icon: 'ti-layout-dashboard', roles: ['admin', 'planner', 'it', 'cmt', 'view'] },
+          { id: 'monitor', label: 'Monitor Pekerjaan', icon: 'ti-device-desktop-analytics', roles: ['admin'] },
           { id: 'progress', label: 'Progress Migrasi', icon: 'ti-activity', roles: ['admin', 'planner', 'view'] },
           { id: 'planner', label: 'Planner', icon: 'ti-calendar', roles: ['admin', 'planner'] },
-          { id: 'teknisi', label: 'Teknisi Lapangan', icon: 'ti-tool', roles: ['admin', 'teknisi'] },
-          { id: 'pic', label: 'PIC Lapangan', icon: 'ti-clipboard-check', roles: ['admin', 'pic'] },
-          { id: 'it', label: 'Verifikasi IT', icon: 'ti-device-desktop-analytics', roles: ['admin', 'it'] },
-          { id: 'cmt', label: 'Verifikasi CMT', icon: 'ti-circle-check', roles: ['admin', 'cmt'] },
+          { id: 'teknisi', label: 'Teknisi Lapangan', icon: 'ti-tool', roles: ['teknisi'] },
+          { id: 'pic', label: 'PIC Lapangan', icon: 'ti-clipboard-check', roles: ['pic'] },
+          { id: 'it', label: 'Verifikasi IT', icon: 'ti-device-desktop-analytics', roles: ['it'] },
+          { id: 'cmt', label: 'Verifikasi CMT', icon: 'ti-circle-check', roles: ['cmt'] },
           { id: 'rekap', label: 'Rekap Migrasi', icon: 'ti-report', roles: ['admin', 'planner', 'it', 'cmt', 'view'] },
           { id: 'admin', label: 'Admin Panel', icon: 'ti-settings', roles: ['admin'] }
         ];
@@ -12791,6 +13138,7 @@ function doPost(e) {
 
             <main className="view-content">
               {tab === 'dashboard' && <DashboardView units={units} isMobile={isMobile} />}
+              {tab === 'monitor' && <MonitorPekerjaanView units={units} isMobile={isMobile} />}
               {tab === 'progress' && <ProgressMonitoringView units={units} isMobile={isMobile} />}
               {tab === 'planner' && <PlannerView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
               {tab === 'teknisi' && <TeknisiView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
