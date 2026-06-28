@@ -4713,17 +4713,28 @@
 
           {/* GPS Installation Status List */}
           {(() => {
+            const plannedUnits = units
+              .filter(u => u.planDate && (!u.statusPasang || u.statusPasang === 'BELUM DIPASANG'))
+              .sort((a, b) => {
+                const parseDate = (dStr) => {
+                  if (!dStr) return 0;
+                  const parts = dStr.split('-');
+                  if (parts.length < 3) return 0;
+                  return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+                };
+                return parseDate(a.planDate) - parseDate(b.planDate);
+              });
             const installedUnits = units.filter(u => u.statusPasang && u.statusPasang !== 'BELUM DIPASANG' && u.statusPasang !== 'ON PROGRESS' && u.statusPasang !== '');
             const onProgressUnits = units.filter(u => u.statusPasang === 'ON PROGRESS');
-            const belumUnits = units.filter(u => !u.statusPasang || u.statusPasang === 'BELUM DIPASANG');
+            const unplannedUnits = units.filter(u => !u.planDate && (!u.statusPasang || u.statusPasang === 'BELUM DIPASANG'));
             if (units.length === 0) return null;
             return (
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)', flexWrap: 'wrap' }}>
                   <i className="bi bi-broadcast" style={{ fontSize: 18, color: '#22C55E' }}></i>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', flex: 1 }}>Status Pemasangan GPS Per Unit</span>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', flex: 1, minWidth: 200 }}>Status Pemasangan GPS Per Unit</span>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(34,197,94,0.12)', color: '#22C55E', fontWeight: 600 }}>
                       <i className="bi bi-check-circle-fill" style={{ marginRight: 4 }}></i>{installedUnits.length} Terpasang
                     </span>
@@ -4732,19 +4743,40 @@
                         <i className="bi bi-tools" style={{ marginRight: 4 }}></i>{onProgressUnits.length} Progress
                       </span>
                     )}
-                    <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(239,68,68,0.1)', color: '#EF4444', fontWeight: 600 }}>
-                      <i className="bi bi-clock" style={{ marginRight: 4 }}></i>{belumUnits.length} Belum
+                    <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(37,99,235,0.12)', color: 'var(--color-plan)', fontWeight: 600 }}>
+                      <i className="bi bi-calendar-event" style={{ marginRight: 4 }}></i>{plannedUnits.length} Terjadwal
+                    </span>
+                    <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(100,116,139,0.12)', color: '#64748B', fontWeight: 600 }}>
+                      <i className="bi bi-clock" style={{ marginRight: 4 }}></i>{unplannedUnits.length} Belum Plan
                     </span>
                   </div>
                 </div>
-                {/* Two-column list */}
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 0 }}>
-                  {/* LEFT: Terpasang */}
+                {/* Three-column list */}
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: 0 }}>
+                  {/* COLUMN 1: Terjadwal */}
+                  <div style={{ borderRight: isMobile ? 'none' : '1px solid var(--border-color)', borderBottom: isMobile ? '1px solid var(--border-color)' : 'none' }}>
+                    <div style={{ padding: '8px 14px', background: 'rgba(37,99,235,0.06)', borderBottom: '1px solid var(--border-color)', fontSize: 11, fontWeight: 700, color: 'var(--color-plan)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <i className="bi bi-calendar-event"></i> UNIT TERJADWAL ({plannedUnits.length})
+                    </div>
+                    <div style={{ maxHeight: 220, overflowY: 'auto', padding: '6px 0' }}>
+                      {plannedUnits.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '16px 0', color: 'var(--text-tertiary)', fontSize: 11 }}>Belum ada unit terjadwal</div>
+                      ) : plannedUnits.map((u, idx) => (
+                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderBottom: idx < plannedUnits.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
+                          <i className="bi bi-calendar-check" style={{ fontSize: 11, color: 'var(--color-plan)', flexShrink: 0 }}></i>
+                          <span style={{ fontWeight: 700, fontSize: 12, color: 'var(--text-primary)', minWidth: 90 }}>{u.nopol}</span>
+                          <span style={{ fontSize: 10, color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.pool || u.location}</span>
+                          <span style={{ fontSize: 10, color: 'var(--color-plan)', fontWeight: 600, flexShrink: 0 }}><i className="bi bi-calendar" style={{ marginRight: 4 }}></i>{u.planDate}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* COLUMN 2: Terpasang & Progress */}
                   <div style={{ borderRight: isMobile ? 'none' : '1px solid var(--border-color)', borderBottom: isMobile ? '1px solid var(--border-color)' : 'none' }}>
                     <div style={{ padding: '8px 14px', background: 'rgba(34,197,94,0.06)', borderBottom: '1px solid var(--border-color)', fontSize: 11, fontWeight: 700, color: '#22C55E', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <i className="bi bi-check-circle-fill"></i> GPS SUDAH TERPASANG ({installedUnits.length + onProgressUnits.length})
+                      <i className="bi bi-check-circle-fill"></i> TERPASANG & PROGRESS ({installedUnits.length + onProgressUnits.length})
                     </div>
-                    <div style={{ maxHeight: 200, overflowY: 'auto', padding: '6px 0' }}>
+                    <div style={{ maxHeight: 220, overflowY: 'auto', padding: '6px 0' }}>
                       {[...installedUnits, ...onProgressUnits].length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '16px 0', color: 'var(--text-tertiary)', fontSize: 11 }}>Belum ada unit terpasang</div>
                       ) : [...installedUnits, ...onProgressUnits].map((u, idx) => (
@@ -4757,22 +4789,22 @@
                       ))}
                     </div>
                   </div>
-                  {/* RIGHT: Belum */}
+                  {/* COLUMN 3: Belum Plan */}
                   <div>
-                    <div style={{ padding: '8px 14px', background: 'rgba(239,68,68,0.05)', borderBottom: '1px solid var(--border-color)', fontSize: 11, fontWeight: 700, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <i className="bi bi-clock"></i> BELUM DIPASANG ({belumUnits.length})
+                    <div style={{ padding: '8px 14px', background: 'rgba(100,116,139,0.05)', borderBottom: '1px solid var(--border-color)', fontSize: 11, fontWeight: 700, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <i className="bi bi-clock"></i> BELUM DIPLAN ({unplannedUnits.length})
                     </div>
-                    <div style={{ maxHeight: 200, overflowY: 'auto', padding: '6px 0' }}>
-                      {belumUnits.length === 0 ? (
+                    <div style={{ maxHeight: 220, overflowY: 'auto', padding: '6px 0' }}>
+                      {unplannedUnits.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '16px 0', color: '#22C55E', fontSize: 11 }}>
-                          <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }}></i>Semua unit sudah terpasang!
+                          <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }}></i>Semua unit sudah di-plan!
                         </div>
-                      ) : belumUnits.map((u, idx) => (
-                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderBottom: idx < belumUnits.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
+                      ) : unplannedUnits.map((u, idx) => (
+                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderBottom: idx < unplannedUnits.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
                           <i className="bi bi-circle" style={{ fontSize: 10, color: '#64748B', flexShrink: 0 }}></i>
                           <span style={{ fontWeight: 700, fontSize: 12, color: 'var(--text-primary)', minWidth: 90 }}>{u.nopol}</span>
                           <span style={{ fontSize: 10, color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.pool || u.location}</span>
-                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: 'rgba(100,116,139,0.1)', color: '#64748B', fontWeight: 600, flexShrink: 0 }}>BELUM</span>
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: 'rgba(100,116,139,0.1)', color: '#64748B', fontWeight: 600, flexShrink: 0 }}>BELUM PLAN</span>
                         </div>
                       ))}
                     </div>
