@@ -1,0 +1,117 @@
+Line 3405: return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w300`;
+Line 3520: if (p[0].length === 4) return `${p[0]}-${String(p[1]).padStart(2, '0')}-${String(p[2]).padStart(2, '0')}`;
+Line 3521: return `${p[2]}-${String(p[1]).padStart(2, '0')}-${String(p[0]).padStart(2, '0')}`;
+Line 3531: return `${p[2]}-${p[1]}-${p[0]}`;
+Line 3568: const filename = `${cleanNopol}_${fieldName}_${Date.now()}.${ext}`;
+Line 3782: const htmlContent = `
+Line 3893: `;
+Line 3918: return `"${str.replace(/"/g, '""')}"`;
+Line 4094: <div key={t.id} className={`toast ${t.type}`}>
+Line 4095: <i className={`bi ${t.type === 'success' ? 'bi-check-circle-fill' : t.type === 'error' ? 'bi-exclamation-circle-fill' : t.type === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'}`} style={{fontSize: 18, color: t.type === 'success' ? '#22C55E' : t.type === 'error' ? '#EF4444' : t.type === 'warning' ? '#F59E0B' : '#60A5FA', flexShrink: 0}}></i>
+Line 4117: return <span className={`badge ${cl}`}>{trimmed}</span>;
+Line 4152: <div key={k.key} title={`${k.label}: ${val}`} style={{
+Line 4154: height: `${Math.max(4, pct)}%`,
+Line 4185: path: `M${c},${c} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`,
+Line 4191: <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+Line 4317: <i className={`bi ${u.statusPasang === 'ON PROGRESS' ? 'bi-tools' : 'bi-check-circle-fill'}`} style={{ fontSize: 11, color: u.statusPasang === 'ON PROGRESS' ? '#F59E0B' : '#22C55E', flexShrink: 0 }}></i>
+Line 4406: <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+Line 4572: <span className={colorClass} title={`Sedang di tahap: ${stageName}`} />
+Line 4577: <span className="progress-dot past" title={`Selesai: ${stageName}`} />
+Line 4581: <span className="progress-dot future" title={`Antrean: ${stageName}`} />
+Line 4591: return { activity: 'Jadwal Dibuat', notes: `Rencana pasang: ${u.planDate} di ${u.lokasiPasang || '—'}.` };
+Line 4593: return { activity: 'Instalasi Lapangan', notes: `Sedang dipasang oleh ${u.teknisiPelaksana || 'Teknisi'}.` };
+Line 4595: return { activity: 'Verifikasi PIC', notes: `Instalasi selesai. Menunggu verifikasi PIC Lapangan (${u.picLapangan || '—'}).` };
+Line 4603: return { activity: 'Update Data', notes: u.updatedAt ? `Pembaruan terakhir pada ${u.updatedAt}` : 'Data terdaftar.' };
+Line 4665: return `"${str.replace(/"/g, '""')}"`;
+Line 4758: setImportError(`Kolom "NOPOL" tidak ditemukan di baris pertama CSV. Header terdeteksi: [${fileHeaders.join(', ')}]. Gunakan pemisah koma (,) atau titik koma (;).`);
+Line 4901: globalAddToast(`Impor sukses! Berhasil memproses ${validItems.length} unit (${countBaru} baru, ${countUpdate} diperbarui).`, 'success');
+Line 4979: ? `Jadwal NOPOL ${unit.nopol} berhasil dihapus!`
+Line 4980: : `Jadwal NOPOL ${unit.nopol} berhasil disimpan!`,
+Line 4995: globalAddToast(`NOPOL ${cleanNopol} sudah terdaftar di database!`, 'error');
+Line 5066: globalAddToast(`Unit baru ${cleanNopol} berhasil ditambahkan!`, 'success');
+Line 5208: <td>{u.merk ? `${u.merk} ${u.assetType || ''}`.trim() : <span style={{color:'var(--text-tertiary)'}}>—</span>}</td>
+Line 5622: if (confirm(`Apakah Anda yakin ingin menghapus jadwal untuk NOPOL ${selectedUnit.nopol}?`)) {
+Line 5706: className={`csv-dropzone ${dragActive ? 'drag-active' : ''}`}
+Line 5773: <span className={`badge ${row.status === 'BARU' ? 'success' : row.status === 'UPDATE' ? 'primary' : 'danger'}`} style={{ fontSize: 9, padding: '2px 6px' }}>
+Line 5792: width: `${Math.round((importProgress / importPreviewData.filter(item => item.status === 'BARU' || item.status === 'UPDATE').length) * 100)}%`,
+Line 5883: <span className={colorClass} title={`Sedang di tahap: ${stageName}`} />
+Line 5888: <span className="progress-dot past" title={`Selesai: ${stageName}`} />
+Line 5892: <span className="progress-dot future" title={`Antrean: ${stageName}`} />
+Line 5902: return { activity: 'Jadwal Dibuat', notes: `Rencana pasang: ${u.planDate} di ${u.lokasiPasang || '—'}.` };
+Line 5904: return { activity: 'Instalasi Lapangan', notes: `Sedang dipasang oleh ${u.teknisiPelaksana || 'Teknisi'}.` };
+Line 5906: return { activity: 'Verifikasi PIC', notes: `Instalasi selesai. Menunggu verifikasi PIC Lapangan (${u.picLapangan || '—'}).` };
+Line 5914: return { activity: 'Update Data', notes: u.updatedAt ? `Pembaruan terakhir pada ${u.updatedAt}` : 'Data terdaftar.' };
+Line 5996: <div style={{ width: `${pct}%`, height: '100%', background: currentStage === 'COMPLETED' ? 'var(--color-done)' : 'var(--accent)' }} />
+Line 6411: globalAddToast(`Gagal: Unit ini sudah diklaim oleh ${currentClaimer}!`, 'danger');
+Line 6421: const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 6440: globalAddToast(`Berhasil mengklaim unit ${u.nopol}!`, 'success');
+Line 6451: if (!confirm(`Apakah Anda yakin ingin membatalkan klaim untuk unit ${u.nopol}? Unit ini akan dikembalikan ke daftar tugas agar bisa diklaim oleh teknisi lain.`)) {
+Line 6461: const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 6485: globalAddToast(`Klaim unit ${u.nopol} berhasil dibatalkan!`, 'success');
+Line 6698: const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 6734: globalAddToast(`Laporan unit ${activeUnit.nopol} berhasil dikirim!`, 'success');
+Line 6794: className={`btn ${subTab === 'today' ? 'btn-primary' : 'btn-secondary'}`}
+Line 6802: className={`btn ${subTab === 'installations' ? 'btn-primary' : 'btn-secondary'}`}
+Line 6810: className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
+Line 7100: {isCompleted ? <i className="bi bi-check" style={{fontSize: 14}}></i> : <i className={`ti ${s.icon}`} style={{fontSize: 12}}></i>}
+Line 7202: className={`teknisi-btn-option ${modelGpsBaru === m ? 'active' : ''}`}
+Line 7218: className={`teknisi-btn-option ${gps === opt ? (opt === 'TERPASANG' ? 'active' : 'active danger') : ''}`}
+Line 7234: className={`teknisi-btn-option ${buzzer === opt ? (opt === 'TERPASANG' ? 'active' : 'active danger') : ''}`}
+Line 7250: className={`teknisi-btn-option ${sos === opt ? (opt === 'TERPASANG' ? 'active' : 'active danger') : ''}`}
+Line 7270: className={`teknisi-btn-option ${isActive ? activeClass : ''}`}
+Line 7292: className={`teknisi-btn-option ${isActive ? activeClass : ''}`}
+Line 7861: className={`teknisi-nav-item ${subTab === 'today' ? 'active' : ''}`}
+Line 7871: className={`teknisi-nav-item ${subTab === 'installations' ? 'active' : ''}`}
+Line 7881: className={`teknisi-nav-item ${subTab === 'history' ? 'active' : ''}`}
+Line 8108: globalAddToast(`Gagal: Unit ini sudah diklaim oleh PIC ${freshPicClaimer}!`, 'danger');
+Line 8131: globalAddToast(`Berhasil mengklaim unit ${u.nopol}!`, 'success');
+Line 8141: if (!confirm(`Apakah Anda yakin ingin membatalkan klaim untuk unit ${u.nopol}?`)) {
+Line 8159: globalAddToast(`Klaim unit ${u.nopol} berhasil dibatalkan!`, 'success');
+Line 8230: const ts = `${now.getFullYear()}-${dd(now.getMonth() + 1)}-${dd(now.getDate())} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 8262: globalAddToast(`Verifikasi PIC Lapangan NOPOL ${unit.nopol} berhasil dikirim!`, 'success');
+Line 8290: className={`btn ${subTab === 'queue' ? 'btn-primary' : 'btn-secondary'}`}
+Line 8298: className={`btn ${subTab === 'my_claims' ? 'btn-primary' : 'btn-secondary'}`}
+Line 8306: className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
+Line 8390: ? `Semua unit sedang diklaim PIC lain (${claimedByOther.length} unit). Tidak ada yang tersedia saat ini.`
+Line 8489: ? `Semua unit sedang diklaim PIC lain (${claimedByOther.length} unit). Tidak ada yang tersedia saat ini.`
+Line 8613: <button type="button" key={o} className={`teknisi-btn-option ${picCekFisikLama === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} style={{ padding: '8px 12px', fontSize: 11 }} onClick={() => setPicCekFisikLama(o)}>
+Line 8624: <button type="button" key={o} className={`teknisi-btn-option ${picCekFisikBaru === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} style={{ padding: '8px 12px', fontSize: 11 }} onClick={() => setPicCekFisikBaru(o)}>
+Line 8635: <button type="button" key={o} className={`teknisi-btn-option ${picCekKondisiSelesai === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} style={{ padding: '8px 12px', fontSize: 11 }} onClick={() => setPicCekKondisiSelesai(o)}>
+Line 8646: <button type="button" key={o} className={`teknisi-btn-option ${picCekFitur === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} style={{ padding: '8px 12px', fontSize: 11 }} onClick={() => setPicCekFitur(o)}>
+Line 8999: className={`teknisi-nav-item ${subTab === 'queue' ? 'active' : ''}`}
+Line 9009: className={`teknisi-nav-item ${subTab === 'my_claims' ? 'active' : ''}`}
+Line 9019: className={`teknisi-nav-item ${subTab === 'history' ? 'active' : ''}`}
+Line 9166: const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 9189: globalAddToast(`Verifikasi IT NOPOL ${unit.nopol} berhasil dikirim!`, 'success');
+Line 9306: <button type="button" key={o} className={`teknisi-btn-option ${itCekAplikasi === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} onClick={() => setItCekAplikasi(o)}>
+Line 9500: const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 9524: globalAddToast(`Verifikasi CMT NOPOL ${unit.nopol} berhasil diselesaikan! Migrasi Lengkap.`, 'success');
+Line 9526: globalAddToast(`CMT NOPOL ${unit.nopol} tersimpan — menunggu penyerahan GPS lama ke vendor.`, 'warning');
+Line 9648: <button type="button" key={o} className={`teknisi-btn-option ${cmtCekAplikasi === o ? (o === 'OK' ? 'active' : 'active danger') : ''}`} onClick={() => setCmtCekAplikasi(o)}>
+Line 9663: className={`teknisi-btn-option ${cmtStatusPenyerahan === o ? (o === 'SUDAH' ? 'active' : 'active danger') : ''}`}
+Line 9767: <button className={`btn ${subTab === 'summary' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setSubTab('summary')} style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6 }}>
+Line 9770: <button className={`btn ${subTab === 'details' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => { setSubTab('details'); setPage(1); }} style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6 }}>
+Line 9815: <div style={{ width: `${d.pct}%`, height: '100%', background: 'var(--color-done)' }} />
+Line 9847: <div style={{ width: `${d.pct}%`, height: '100%', background: 'var(--color-done)' }} />
+Line 10017: globalAddToast(`User ${name} dengan role ${role} berhasil dibuat!`, 'success');
+Line 10031: if (confirm(`Apakah Anda yakin ingin menghapus user ${uName}?`)) {
+Line 10261: <div style={{ height: '100%', width: `${pctDone}%`, borderRadius: 4, background: pctDone > 70 ? '#10B981' : pctDone > 30 ? '#F59E0B' : '#3B82F6', transition: 'width 0.4s ease' }} />
+Line 10313: <span>{pending > 0 ? `${pending} unit menunggu verifikasi` : 'Semua unit terverifikasi ✓'}</span>
+Line 10317: <div style={{ height: '100%', width: `${pctVerif}%`, borderRadius: 4, background: pctVerif > 70 ? '#10B981' : pctVerif > 30 ? '#F59E0B' : '#3B82F6', transition: 'width 0.4s ease' }} />
+Line 10331: <i className={`ti ${showGASGuide ? 'ti-chevron-up' : 'ti-chevron-down'}`}></i>
+Line 10337: {`// =========================================================================
+Line 10599: }`}                </div>
+Line 10827: const ts = `${now.getFullYear()}-${dd(now.getMonth() + 1)}-${dd(now.getDate())} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
+Line 10908: nopol: `B ${1000 + i * 23} ABC`,
+Line 10916: lokasiPasang: i % 3 === 0 ? `POOL ${LOCS[i % LOCS.length]}` : '',
+Line 10935: <div className={`app-wrapper ${isMobile && (user.role === 'teknisi' || user.role === 'pic') ? 'mobile-only' : ''}`}>
+Line 10940: className={`sidebar-overlay ${mobileMenuOpen ? 'open' : ''}`}
+Line 10943: <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+Line 10975: className={`menu-item ${tab === t.id ? 'active' : ''}`}
+Line 10977: <i className={`ti ${t.icon}`}></i>
+Line 11015: <div className={`sync-status ${syncState}`}>
+Line 11016: <i className={`ti ${syncState === 'syncing' ? 'ti-refresh' : syncState === 'success' ? 'ti-cloud-check' : 'ti-cloud-off'}`}></i>
+Line 11050: <button key={t.id} onClick={() => setTab(t.id)} className={`mobile-nav-item ${tab === t.id ? 'active' : ''}`}>
+Line 11051: <i className={`ti ${t.icon}`}></i>
+Line 11055: <button className={`mobile-nav-item ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+Line 11133: <i className={`ti ${showPassword ? 'ti-eye-off' : 'ti-eye'}`}></i>
