@@ -3505,9 +3505,6 @@
         const teknisiPelaksana = u['TEKNISI PELAKSANA'] || u['TEKNISI_PELAKSANA'] || u['TEKNISI'] || '';
         const modelGpsBaru = u['TIPE GPS BARU'] || u['MODEL_GPS_BARU'] || '';
         const gpsSerialBaru = u['SN GPS BARU'] || u['gpsSerialBaru'] || '';
-        const gpsImeiBaru = u['IMEI GPS BARU'] || u['gpsImeiBaru'] || '';
-        const nomorSIM = u['NOMOR KARTU GPS BARU'] || u['nomorSIM'] || '';
-        const provider = u['PROVIDER SIM GPS BARU'] || u['provider'] || '';
         const gps = u['GPS'] || '';
         const buzzer = u['BUZZER'] || '';
         const sos = u['SOS'] || '';
@@ -3555,9 +3552,6 @@
           teknisiPelaksana,
           modelGpsBaru,
           gpsSerialBaru,
-          gpsImeiBaru,
-          nomorSIM,
-          provider,
           gps,
           buzzer,
           sos,
@@ -3853,9 +3847,6 @@
       const teknisiPelaksana = u.teknisiPelaksana || '—';
       const modelGpsBaru = u.modelGpsBaru || '—';
       const gpsSerialBaru = u.gpsSerialBaru || '—';
-      const gpsImeiBaru = u.gpsImeiBaru || '—';
-      const nomorSIM = u.nomorSIM || '—';
-      const provider = u.provider || '—';
       const gpsSerialLama = u.gpsSerialLama || '—';
       const gps = u.gps || '—';
       const buzzer = u.buzzer || '—';
@@ -3933,20 +3924,12 @@
         "            <tr>\n" +
         "              <td style=\"font-weight: bold;\">Serial GPS Baru</td>\n" +
         "              <td>" + gpsSerialBaru + "</td>\n" +
-        "              <td style=\"font-weight: bold;\">IMEI GPS Baru</td>\n" +
-        "              <td>" + gpsImeiBaru + "</td>\n" +
-        "            </tr>\n" +
-        "            <tr>\n" +
-        "              <td style=\"font-weight: bold;\">Nomor SIM Card</td>\n" +
-        "              <td>" + nomorSIM + "</td>\n" +
-        "              <td style=\"font-weight: bold;\">Provider SIM</td>\n" +
-        "              <td>" + provider + "</td>\n" +
-        "            </tr>\n" +
-        "            <tr>\n" +
         "              <td style=\"font-weight: bold;\">Serial GPS Lama</td>\n" +
         "              <td>" + gpsSerialLama + "</td>\n" +
+        "            </tr>\n" +
+        "            <tr>\n" +
         "              <td style=\"font-weight: bold;\">Status GPS</td>\n" +
-        "              <td>" + gps + "</td>\n" +
+        "              <td colspan=\"3\">" + gps + "</td>\n" +
         "            </tr>\n" +
         "            <tr>\n" +
         "              <td style=\"font-weight: bold;\">Buzzer / SOS</td>\n" +
@@ -4204,9 +4187,6 @@
       const teknisiPelaksana = u.teknisiPelaksana || '—';
       const modelGpsBaru = u.modelGpsBaru || '—';
       const gpsSerialBaru = u.gpsSerialBaru || '—';
-      const gpsImeiBaru = u.gpsImeiBaru || '—';
-      const nomorSIM = u.nomorSIM || '—';
-      const provider = u.provider || '—';
       const gpsSerialLama = u.gpsSerialLama || '—';
       const gps = u.gps || '—';
       const buzzer = u.buzzer || '—';
@@ -4270,20 +4250,12 @@
         '    <tr>' +
         '      <td style="font-weight: bold;">Serial GPS Baru</td>' +
         '      <td>' + gpsSerialBaru + '</td>' +
-        '      <td style="font-weight: bold;">IMEI GPS Baru</td>' +
-        '      <td>' + gpsImeiBaru + '</td>' +
-        '    </tr>' +
-        '    <tr>' +
-        '      <td style="font-weight: bold;">Nomor SIM Card</td>' +
-        '      <td>' + nomorSIM + '</td>' +
-        '      <td style="font-weight: bold;">Provider SIM</td>' +
-        '      <td>' + provider + '</td>' +
-        '    </tr>' +
-        '    <tr>' +
         '      <td style="font-weight: bold;">Serial GPS Lama</td>' +
         '      <td>' + gpsSerialLama + '</td>' +
+        '    </tr>' +
+        '    <tr>' +
         '      <td style="font-weight: bold;">Status GPS</td>' +
-        '      <td>' + gps + '</td>' +
+        '      <td colspan="3">' + gps + '</td>' +
         '    </tr>' +
         '    <tr>' +
         '      <td style="font-weight: bold;">Buzzer / SOS</td>' +
@@ -4358,8 +4330,8 @@
     const exportToCSV = (dataList, filename) => {
       const headers = [
         'NO', 'OWNERSHIP', 'NOPOL', 'YEAR', 'MERK', 'ASSET TYPE', 'BUSINESS LOCATION', 'BUSINESS POOL', 'BUSINESS DEDICATE',
-        'PLAN PASANG', 'LOKASI PASANG', 'PIC LAPANGAN', 'TEKNISI PELAKSANA', 'TIPE GPS BARU', 'SN GPS BARU', 'IMEI GPS BARU',
-        'NOMOR KARTU GPS BARU', 'PROVIDER SIM GPS BARU', 'GPS', 'BUZZER', 'SOS', 'SENSOR WING', 'CAMERA',
+        'PLAN PASANG', 'LOKASI PASANG', 'PIC LAPANGAN', 'TEKNISI PELAKSANA', 'TIPE GPS BARU', 'SN GPS BARU',
+        'GPS', 'BUZZER', 'SOS', 'SENSOR WING', 'CAMERA',
         'FOTO KENDARAAN (NOPOL)', 'FOTO SERIAL GPS LAMA (DICABUT)', 'FOTO GPS BARU (SN TERLIHAT)', 'FOTO HASIL INSTALASI', 'STATUS REGISTRASI',
         'CEK FISIK GPS LAMA', 'CEK FISIK GPS BARU', 'CEK KONDISI UNIT SELESAI INSTALASI', 'CEK FITUR (SENSOR, SOS, CAMERA)', 'FOTO BUKTI PENYERAHAN GPS LAMA',
         'CEK UNIT DI APLIKASI (TEMON /GEOTAB / SMATRACK) - IT', 'FOTO INTEGRASI DATA GPS KE PUNINAR', 'FOTO INTEGRASI DATA ABNORMALITY KE PUNINAR',
@@ -4377,8 +4349,8 @@
 
       const rows = dataList.map((u, i) => [
         i + 1, u.ownership, u.nopol, u.year, u.merk, u.assetType, u.location, u.pool, u.dedicate,
-        u.planDate, u.lokasiPasang, u.picLapangan, u.teknisiPelaksana, u.modelGpsBaru, u.gpsSerialBaru, u.gpsImeiBaru,
-        u.nomorSIM, u.provider, u.gps, u.buzzer, u.sos, u.sensorWing, u.camera,
+        u.planDate, u.lokasiPasang, u.picLapangan, u.teknisiPelaksana, u.modelGpsBaru, u.gpsSerialBaru,
+        u.gps, u.buzzer, u.sos, u.sensorWing, u.camera,
         u.fotoKendaraan, u.fotoGPSLama, u.fotoGPSBaru, u.fotoHasilInstalasi, u.statusPasang,
         u.picCekFisikLama, u.picCekFisikBaru, u.picCekKondisiSelesai, u.picCekFitur, u.picFotoSerahTerima,
         u.itCekAplikasi, u.itFotoIntegrasi, u.itFotoAbnormality,
@@ -5459,7 +5431,6 @@
                       <div>Model GPS Baru: <strong>{selectedUnit.modelGpsBaru || '—'}</strong></div>
                       <div>Provider: <strong>{selectedUnit.provider || '—'}</strong></div>
                       <div>SN GPS Baru: <strong>{selectedUnit.gpsSerialBaru || '—'}</strong></div>
-                      <div>IMEI GPS Baru: <strong>{selectedUnit.gpsImeiBaru || '—'}</strong></div>
                     </div>
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 6, fontSize: 10 }}>
                       <strong>Fitur Test:</strong> GPS: {selectedUnit.gps || '—'} • Buzzer: {selectedUnit.buzzer || '—'} • SOS: {selectedUnit.sos || '—'} • Sensor Wing: {selectedUnit.sensorWing || '—'} • Camera: {selectedUnit.camera || '—'}
@@ -5738,10 +5709,10 @@
 
       // 1. Download CSV Template Helper
       const downloadCSVTemplate = () => {
-        const headers = ['OWNERSHIP', 'NOPOL', 'YEAR', 'MERK', 'ASSET TYPE', 'LOCATION', 'POOL', 'DEDICATE', 'SN GPS LAMA', 'TIPE GPS BARU', 'SN GPS BARU', 'IMEI GPS BARU'];
+        const headers = ['OWNERSHIP', 'NOPOL', 'YEAR', 'MERK', 'ASSET TYPE', 'LOCATION', 'POOL', 'DEDICATE', 'SN GPS LAMA', 'TIPE GPS BARU', 'SN GPS BARU'];
         const sampleRows = [
-          ['PUNINAR', 'B 1234 ABC', '2015', 'MITSUBISHI', 'PRIME MOVER 4X2', LOCS[0] || 'JAKARTA', POOLS[0] || 'POOL A', 'LOGISTICS', 'EG-OLD123', 'GEOTAB', 'EG-12345', '351234567890123'],
-          ['PUNINAR', 'B 5678 DEF', '2018', 'TOYOTA', 'DYNA', LOCS[0] || 'JAKARTA', POOLS[0] || 'POOL A', 'LOGISTICS', 'EG-OLD456', 'SMA-TRACK', 'EG-67890', '351234567890456']
+          ['PUNINAR', 'B 1234 ABC', '2015', 'MITSUBISHI', 'PRIME MOVER 4X2', LOCS[0] || 'JAKARTA', POOLS[0] || 'POOL A', 'LOGISTICS', 'EG-OLD123', 'GEOTAB', 'EG-12345'],
+          ['PUNINAR', 'B 5678 DEF', '2018', 'TOYOTA', 'DYNA', LOCS[0] || 'JAKARTA', POOLS[0] || 'POOL A', 'LOGISTICS', 'EG-OLD456', 'SMA-TRACK', 'EG-67890']
         ];
         
         const csvContent = "\uFEFF" + [
@@ -5842,7 +5813,6 @@
             const idxDedicate = fileHeaders.findIndex(h => h === 'DEDICATE' || h === 'BUSINESS DEDICATE');
             const idxModelGpsBaru = fileHeaders.findIndex(h => h === 'TIPE GPS BARU' || h === 'TIPE_GPS_BARU' || h === 'MODEL GPS BARU' || h === 'MODEL_GPS_BARU');
             const idxGpsSerialBaru = fileHeaders.findIndex(h => h === 'SN GPS BARU' || h === 'SN_GPS_BARU' || h === 'GPS SERIAL BARU' || h === 'GPS_SERIAL_BARU' || h === 'NO GPS' || h === 'NO_GPS');
-            const idxGpsImeiBaru = fileHeaders.findIndex(h => h === 'IMEI GPS BARU' || h === 'IMEI_GPS_BARU' || h === 'GPS IMEI BARU' || h === 'GPS_IMEI_BARU' || h === 'IMEI');
             const idxGpsSerialLama = fileHeaders.findIndex(h => h === 'SN GPS LAMA' || h === 'SN_GPS_LAMA' || h === 'GPS SERIAL LAMA' || h === 'GPS_SERIAL_LAMA' || h === 'GPS LAMA');
             
             if (idxNopol === -1) {
@@ -5871,7 +5841,6 @@
               const dedicate = idxDedicate > -1 && row[idxDedicate] ? cleanCell(row[idxDedicate]).toUpperCase() : 'LOGISTICS';
               const modelGpsBaru = idxModelGpsBaru > -1 && row[idxModelGpsBaru] ? cleanCell(row[idxModelGpsBaru]).toUpperCase() : 'GEOTAB';
               const gpsSerialBaru = idxGpsSerialBaru > -1 && row[idxGpsSerialBaru] ? cleanCell(row[idxGpsSerialBaru]) : '';
-              const gpsImeiBaru = idxGpsImeiBaru > -1 && row[idxGpsImeiBaru] ? cleanCell(row[idxGpsImeiBaru]) : '';
               const gpsSerialLama = idxGpsSerialLama > -1 && row[idxGpsSerialLama] ? cleanCell(row[idxGpsSerialLama]) : '';
               
               let status = 'BARU';
@@ -5899,7 +5868,6 @@
                 dedicate,
                 modelGpsBaru,
                 gpsSerialBaru,
-                gpsImeiBaru,
                 gpsSerialLama,
                 status,
                 statusText
@@ -5947,7 +5915,6 @@
               "BUSINESS DEDICATE": item.dedicate,
               "TIPE GPS BARU": item.modelGpsBaru,
               "SN GPS BARU": item.gpsSerialBaru,
-              "IMEI GPS BARU": item.gpsImeiBaru,
               "SN GPS LAMA": item.gpsSerialLama,
               "STATUS REGISTRASI": item.status === 'BARU' ? 'BELUM DIPASANG' : undefined
             });
@@ -5970,7 +5937,6 @@
                   dedicate: item.dedicate,
                   modelGpsBaru: item.modelGpsBaru || updatedList[existingIdx].modelGpsBaru,
                   gpsSerialBaru: item.gpsSerialBaru || updatedList[existingIdx].gpsSerialBaru,
-                  gpsImeiBaru: item.gpsImeiBaru || updatedList[existingIdx].gpsImeiBaru,
                   gpsSerialLama: item.gpsSerialLama || updatedList[existingIdx].gpsSerialLama
                 };
               } else {
@@ -6080,9 +6046,6 @@
             "STATUS REGISTRASI": 'BELUM DIPASANG',
             "TIPE GPS BARU": '',
             "SN GPS BARU": '',
-            "IMEI GPS BARU": '',
-            "NOMOR KARTU GPS BARU": '',
-            "PROVIDER SIM GPS BARU": '',
             "GPS": '', "BUZZER": '', "SOS": '', "SENSOR WING": '', "CAMERA": '',
             "SN GPS LAMA": ''
           });
@@ -6184,9 +6147,6 @@
           "TEKNISI PELAKSANA": '',
           "TIPE GPS BARU": newUnit.modelGpsBaru,
           "SN GPS BARU": newUnit.gpsSerialBaru,
-          "IMEI GPS BARU": newUnit.gpsImeiBaru,
-          "NOMOR KARTU GPS BARU": newUnit.nomorSIM,
-          "PROVIDER SIM GPS BARU": newUnit.provider,
           "SN GPS LAMA": newUnit.gpsSerialLama,
           "GPS": '', "BUZZER": '', "SOS": '', "SENSOR WING": '', "CAMERA": '',
           "FOTO KENDARAAN (NOPOL)": '',
@@ -7382,9 +7342,6 @@
       // Form fields
       const [noGpsLama, setNoGpsLama] = useState('');
       const [gpsSerialBaru, setGpsSerialBaru] = useState('');
-      const [gpsImeiBaru, setGpsImeiBaru] = useState('');
-      const [nomorSIM, setNomorSIM] = useState('');
-      const [provider, setProvider] = useState('Telkomsel');
       const [catatanPasang, setCatatanPasang] = useState('');
       const [historyReviewUnit, setHistoryReviewUnit] = useState(null);
       
@@ -7486,9 +7443,6 @@
             const stateToSave = {
               noGpsLama,
               gpsSerialBaru,
-              gpsImeiBaru,
-              nomorSIM,
-              provider,
               catatanPasang,
               modelGpsBaru,
               gps,
@@ -7513,9 +7467,6 @@
         activeUnitId,
         noGpsLama,
         gpsSerialBaru,
-        gpsImeiBaru,
-        nomorSIM,
-        provider,
         catatanPasang,
         modelGpsBaru,
         gps,
@@ -7977,7 +7928,6 @@
         const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
 
         const updates = {
-          "STATUS REGISTRASI": 'TEKNISI SUBMITTED',
           "TIPE GPS BARU": modelGpsBaru,
           "TEKNISI PELAKSANA": nameMatch,
           "GPS": gps,
@@ -7986,9 +7936,6 @@
           "SENSOR WING": sensorWing,
           "CAMERA": camera,
           "SN GPS BARU": gpsSerialBaru,
-          "IMEI GPS BARU": gpsImeiBaru,
-          "NOMOR KARTU GPS BARU": nomorSIM,
-          "PROVIDER SIM GPS BARU": provider,
           "FOTO KENDARAAN (NOPOL)": urlFotoKendaraan,
           "FOTO SERIAL GPS LAMA (DICABUT)": urlFotoGPSLama,
           "FOTO GPS BARU (SN TERLIHAT)": urlFotoGPSBaru,
@@ -8008,9 +7955,6 @@
             fotoOdometer: urlFotoOdometer,
             gpsSerialLama: noGpsLama,
             gpsSerialBaru: gpsSerialBaru,
-            gpsImeiBaru: gpsImeiBaru,
-            nomorSIM: nomorSIM,
-            provider: provider,
             catatanPasang: catatanPasang,
             modelGpsBaru: modelGpsBaru,
             easygoDicopot: 'SUDAH',
@@ -11696,9 +11640,6 @@
                       <th>TEKNISI PELAKSANA</th>
                       <th>TIPE GPS BARU</th>
                       <th>SN GPS BARU</th>
-                      <th>IMEI GPS BARU</th>
-                      <th>NOMOR SIM</th>
-                      <th>PROVIDER</th>
                       <th>GPS</th>
                       <th>BUZZER</th>
                       <th>SOS</th>
@@ -11732,9 +11673,6 @@
                         <td>{u.teknisiPelaksana || '—'}</td>
                         <td>{u.modelGpsBaru || '—'}</td>
                         <td><code>{u.gpsSerialBaru || '—'}</code></td>
-                        <td><code>{u.gpsImeiBaru || '—'}</code></td>
-                        <td>{u.nomorSIM || '—'}</td>
-                        <td>{u.provider || '—'}</td>
                         <td><Badge val={u.gps} /></td>
                         <td><Badge val={u.buzzer} /></td>
                         <td><Badge val={u.sos} /></td>
@@ -11751,7 +11689,7 @@
                     ))}
                     {paginatedUnits.length === 0 && (
                       <tr>
-                        <td colSpan="31" style={{ textAlign: 'center', padding: 24, color: 'var(--text-tertiary)' }}>Tidak ada data unit migrasi</td>
+                        <td colSpan="28" style={{ textAlign: 'center', padding: 24, color: 'var(--text-tertiary)' }}>Tidak ada data unit migrasi</td>
                       </tr>
                     )}
                   </tbody>
@@ -12476,8 +12414,7 @@ function setupDatabase() {
   // 39 Kolom Header lengkap sesuai kebutuhan Web App & Excel Master
   var headers = [
     "NO", "OWNERSHIP", "NOPOL", "YEAR", "MERK", "ASSET TYPE", "BUSINESS LOCATION", "BUSINESS POOL", "BUSINESS DEDICATE",
-    "PLAN PASANG", "LOKASI PASANG", "PIC LAPANGAN", "TEKNISI PELAKSANA", "TIPE GPS BARU", "SN GPS BARU", "IMEI GPS BARU",
-    "NOMOR KARTU GPS BARU", "PROVIDER SIM GPS BARU", "GPS", "BUZZER", "SOS", "SENSOR WING", "CAMERA",
+    "PLAN PASANG", "LOKASI PASANG", "PIC LAPANGAN", "TEKNISI PELAKSANA", "TIPE GPS BARU", "SN GPS BARU", "GPS", "BUZZER", "SOS", "SENSOR WING", "CAMERA",
     "FOTO KENDARAAN (NOPOL)", "FOTO SERIAL GPS LAMA (DICABUT)", "FOTO GPS BARU (SN TERLIHAT)", "FOTO HASIL INSTALASI", "STATUS REGISTRASI",
     "CEK FISIK GPS LAMA", "CEK FISIK GPS BARU", "CEK KONDISI UNIT SELESAI INSTALASI", "CEK FITUR (SENSOR, SOS, CAMERA)", "FOTO BUKTI PENYERAHAN GPS LAMA",
     "CEK UNIT DI APLIKASI (TEMON /GEOTAB / SMATRACK)", "FOTO INTEGRASI DATA GPS KE PUNINAR", "FOTO INTEGRASI DATA ABNORMALITY KE PUNINAR",
@@ -12645,9 +12582,6 @@ function doPost(e) {
           else if (key === "LOKASI_PASANG" || key === "LOKASI PASANG") colIndex = headers.indexOf("LOKASI PASANG");
           else if (key === "MODEL_GPS_BARU" || key === "TIPE GPS BARU") colIndex = headers.indexOf("TIPE GPS BARU");
           else if (key === "GPS_SERIAL_BARU" || key === "SN GPS BARU") colIndex = headers.indexOf("SN GPS BARU");
-          else if (key === "GPS_IMEI_BARU" || key === "IMEI GPS BARU") colIndex = headers.indexOf("IMEI GPS BARU");
-          else if (key === "NOMOR_SIM" || key === "NOMOR KARTU GPS BARU") colIndex = headers.indexOf("NOMOR KARTU GPS BARU");
-          else if (key === "PROVIDER" || key === "PROVIDER SIM GPS BARU") colIndex = headers.indexOf("PROVIDER SIM GPS BARU");
           else if (key === "CATATAN_PASANG" || key === "CATATAN PEMAASANGAN") colIndex = headers.indexOf("CATATAN PEMAASANGAN");
           else if (key === "FOTO_KENDARAAN" || key === "FOTO KENDARAAN (NOPOL)") colIndex = headers.indexOf("FOTO KENDARAAN (NOPOL)");
           else if (key === "FOTO_GPS_LAMA" || key === "FOTO SERIAL GPS LAMA (DICABUT)") colIndex = headers.indexOf("FOTO SERIAL GPS LAMA (DICABUT)");
@@ -12881,9 +12815,6 @@ function doPost(e) {
           else if (normKey === 'CMT SUBMIT AT' || normKey === 'CMTSUBMITAT') col = 'cmtSubmitAt';
           else if (normKey === 'IT SUBMIT AT' || normKey === 'ITSUBMITAT') col = 'itSubmitAt';
           else if (normKey === 'FOTO ODOMETER' || normKey === 'FOTO_ODOMETER' || normKey === 'FOTOODOMETER') col = 'fotoOdometer';
-          else if (normKey === 'IMEI GPS BARU' || normKey === 'GPS_IMEI_BARU' || normKey === 'GPSIMEIBARU' || normKey === 'GPSIMEIBARU') col = 'gpsImeiBaru';
-          else if (normKey === 'NOMOR KARTU GPS BARU' || normKey === 'NOMOR_SIM' || normKey === 'NOMORSIM' || normKey === 'NOMORSIM') col = 'nomorSIM';
-          else if (normKey === 'PROVIDER SIM GPS BARU' || normKey === 'PROVIDER' || normKey === 'PROVIDERSIM' || normKey === 'PROVIDERSIM') col = 'provider';
           else if (normKey === 'CATATAN_PASANG' || normKey === 'CATATAN PASANG' || normKey === 'CATATAN') col = 'catatanPasang';
           else if (normKey === 'STATUSPLAN' || normKey === 'STATUS_PLAN' || normKey === 'STATUS PLAN') { /* statusPlan is computed, skip syncing */ continue; }
           
