@@ -7300,7 +7300,7 @@
       );
     }
 
-      function TeknisiView({ units, setUnits, syncUpdate, isMobile }) {
+      function TeknisiView({ units, setUnits, syncUpdate, isMobile, loadData }) {
       const { user, logout } = useContext(AuthContext);
       const [subTab, setSubTab] = useState(() => {
         try {
@@ -7979,31 +7979,45 @@
         <div className="teknisi-wrapper">
           {/* Top Navigation for Desktop */}
           {!isMobile && (
-            <div style={{ display: 'flex', gap: 10, marginBottom: 20, borderBottom: '1px solid var(--border-color)', paddingBottom: 12 }}>
-              <button 
-                className={`btn ${subTab === 'today' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('today'); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-clipboard-data" style={{ fontSize: 16 }}></i>
-                Tugas Hari Ini
-              </button>
-              <button 
-                className={`btn ${subTab === 'installations' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('installations'); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-wrench" style={{ fontSize: 16 }}></i>
-                My Installs
-              </button>
-              <button 
-                className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('history'); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-check-circle" style={{ fontSize: 16 }}></i>
-                History
-              </button>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20, borderBottom: '1px solid var(--border-color)', paddingBottom: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button 
+                  className={`btn ${subTab === 'today' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('today'); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-clipboard-data" style={{ fontSize: 16 }}></i>
+                  Tugas Hari Ini
+                </button>
+                <button 
+                  className={`btn ${subTab === 'installations' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('installations'); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-wrench" style={{ fontSize: 16 }}></i>
+                  My Installs
+                </button>
+                <button 
+                  className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { if (isScannerOpen) stopScanning(); setSubTab('history'); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-check-circle" style={{ fontSize: 16 }}></i>
+                  History
+                </button>
+              </div>
+              {loadData && (
+                <button 
+                  className="btn btn-secondary btn-sm" 
+                  onClick={() => {
+                    globalAddToast('Menyinkronkan data...', 'info');
+                    loadData(true);
+                  }} 
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38 }}
+                >
+                  <i className="bi bi-arrow-clockwise"></i> Refresh Data
+                </button>
+              )}
             </div>
           )}
           {/* Header Bar */}
@@ -8019,15 +8033,33 @@
             </div>
             
             <div className="teknisi-header-right">
+              {loadData && (
+                <button 
+                  onClick={() => {
+                    globalAddToast('Menyinkronkan data...', 'info');
+                    loadData(true);
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '50%',
+                    width: 32,
+                    height: 32,
+                    color: '#FFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 8,
+                    cursor: 'pointer'
+                  }}
+                  title="Refresh Data"
+                >
+                  <i className="bi bi-arrow-clockwise"></i>
+                </button>
+              )}
               <div className="teknisi-status-pill">
                 <i className="bi bi-wifi teknisi-status-icon"></i>
                 <span>ONLINE</span>
-              </div>
-              <div className="teknisi-header-btn">
-                <i className="bi bi-sun"></i>
-              </div>
-              <div className="teknisi-header-btn">
-                <i className="bi bi-bell"></i>
               </div>
             </div>
           </div>
@@ -9604,33 +9636,47 @@
 
       return (
         <div className="teknisi-wrapper">
-          {/* Top Navigation for Desktop */}
+
           {!isMobile && (
-            <div style={{ display: 'flex', gap: 10, marginBottom: 20, borderBottom: '1px solid var(--border-color)', paddingBottom: 12 }}>
-              <button 
-                className={`btn ${subTab === 'queue' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { setSubTab('queue'); setPage(1); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-clipboard-data" style={{ fontSize: 16 }}></i>
-                Antrean
-              </button>
-              <button 
-                className={`btn ${subTab === 'my_claims' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { setSubTab('my_claims'); setPage(1); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-clipboard-check" style={{ fontSize: 16 }}></i>
-                Klaim Aktif
-              </button>
-              <button 
-                className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => { setSubTab('history'); setPage(1); }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
-              >
-                <i className="bi bi-history" style={{ fontSize: 16 }}></i>
-                Riwayat
-              </button>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20, borderBottom: '1px solid var(--border-color)', paddingBottom: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button 
+                  className={`btn ${subTab === 'queue' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { setSubTab('queue'); setPage(1); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-clipboard-data" style={{ fontSize: 16 }}></i>
+                  Antrean
+                </button>
+                <button 
+                  className={`btn ${subTab === 'my_claims' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { setSubTab('my_claims'); setPage(1); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-clipboard-check" style={{ fontSize: 16 }}></i>
+                  Klaim Aktif
+                </button>
+                <button 
+                  className={`btn ${subTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => { setSubTab('history'); setPage(1); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, height: 38, padding: '0 16px', fontSize: 13, fontWeight: 600 }}
+                >
+                  <i className="bi bi-history" style={{ fontSize: 16 }}></i>
+                  Riwayat
+                </button>
+              </div>
+              {loadData && (
+                <button 
+                  className="btn btn-secondary btn-sm" 
+                  onClick={() => {
+                    globalAddToast('Menyinkronkan data...', 'info');
+                    loadData(true);
+                  }} 
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38 }}
+                >
+                  <i className="bi bi-arrow-clockwise"></i> Refresh Data
+                </button>
+              )}
             </div>
           )}
           {/* Header Bar */}
@@ -9646,6 +9692,30 @@
             </div>
             
             <div className="teknisi-header-right">
+              {loadData && (
+                <button 
+                  onClick={() => {
+                    globalAddToast('Menyinkronkan data...', 'info');
+                    loadData(true);
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '50%',
+                    width: 32,
+                    height: 32,
+                    color: '#FFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 8,
+                    cursor: 'pointer'
+                  }}
+                  title="Refresh Data"
+                >
+                  <i className="bi bi-arrow-clockwise"></i>
+                </button>
+              )}
               <div className="teknisi-status-pill" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>
                 <i className="bi bi-shield-check teknisi-status-icon"></i>
                 <span>PIC ROLE</span>
@@ -13092,8 +13162,8 @@ function doPost(e) {
               {tab === 'monitor' && <MonitorPekerjaanView units={units} isMobile={isMobile} />}
               {tab === 'progress' && <ProgressMonitoringView units={units} isMobile={isMobile} />}
               {tab === 'planner' && <PlannerView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
-              {tab === 'teknisi' && <TeknisiView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
-              {tab === 'pic' && <PICLapanganView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
+              {tab === 'teknisi' && <TeknisiView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} loadData={loadData} />}
+              {tab === 'pic' && <PICLapanganView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} loadData={loadData} />}
               {tab === 'it' && <ITView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
               {tab === 'cmt' && <CMTView units={units} setUnits={setUnits} syncUpdate={syncUpdate} isMobile={isMobile} />}
               {tab === 'rekap' && <RekapView units={units} isMobile={isMobile} />}
