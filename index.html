@@ -9308,7 +9308,7 @@
 
         // 4. Verifikasi View
     // 4. PIC Lapangan View
-    function PICLapanganView({ units, setUnits, syncUpdate, isMobile }) {
+    function PICLapanganView({ units, setUnits, syncUpdate, isMobile, loadData }) {
       const { user, logout } = useContext(AuthContext);
       const nameMatch = user.name || user.username;
 
