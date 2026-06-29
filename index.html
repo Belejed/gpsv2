@@ -5584,27 +5584,27 @@
       const workflowStages = [
         { name: 'UNPLAN', label: 'Unplan' },
         { name: 'PLAN', label: 'Plan' },
-        { name: 'INSTALLATION', label: 'Installing' },
-        { name: 'TEKNISI_SUBMITTED', label: 'Teknisi' },
-        { name: 'PIC_VERIFIED', label: 'PIC' },
-        { name: 'IT_VERIFIED', label: 'IT' },
+        { name: 'TEKNISI', label: 'Teknisi' },
+        { name: 'PIC', label: 'PIC' },
+        { name: 'IT', label: 'IT' },
         { name: 'CMT', label: 'CMT' },
         { name: 'COMPLETED', label: 'Done' }
       ];
 
       const getUnitCurrentStage = (u) => {
         if (u.statusPlan === 'UNPLAN') return 'UNPLAN';
-        if (u.statusPasang === 'ON PROGRESS') return 'INSTALLATION';
-        if (u.statusPasang === 'TEKNISI SUBMITTED') return 'TEKNISI_SUBMITTED';
-        if (u.statusPasang === 'PIC VERIFIED') return 'PIC_VERIFIED';
-        if (u.statusPasang === 'IT VERIFIED' || u.statusPasang === 'IT VERIFIKASI' || u.statusPasang === 'IT PENDING') return 'IT_VERIFIED';
+        if (u.statusPasang === 'ON PROGRESS') return 'TEKNISI';
+        if (u.statusPasang === 'TEKNISI SUBMITTED') return 'PIC';
+        if (u.statusPasang === 'PIC VERIFIED') return 'PIC_VERIFIED'; // wait, stage name in workflowStages is PIC, so we return PIC
+        if (u.statusPasang === 'PIC VERIFIED') return 'PIC';
+        if (u.statusPasang === 'IT VERIFIED' || u.statusPasang === 'IT VERIFIKASI' || u.statusPasang === 'IT PENDING') return 'IT';
         if (u.statusPasang === 'CMT PENDING') return 'CMT';
         if (u.statusPasang === 'DONE') return 'COMPLETED';
         return 'PLAN';
       };
 
       const getStageStatus = (currentStage, stageName) => {
-        const order = ['UNPLAN', 'PLAN', 'INSTALLATION', 'TEKNISI_SUBMITTED', 'PIC_VERIFIED', 'IT_VERIFIED', 'CMT', 'COMPLETED'];
+        const order = ['UNPLAN', 'PLAN', 'TEKNISI', 'PIC', 'IT', 'CMT', 'COMPLETED'];
         const currentIndex = order.indexOf(currentStage);
         const stageNameIndex = order.indexOf(stageName);
         if (currentIndex === stageNameIndex) return 'active';
@@ -5617,7 +5617,7 @@
         
         if (status === 'active') {
           let colorClass = 'progress-dot active';
-          if (currentStage === 'INSTALLATION' || currentStage === 'TEKNISI_SUBMITTED') {
+          if (currentStage === 'TEKNISI' || currentStage === 'PIC') {
             colorClass = 'progress-dot warning animate-pulse';
           } else if (currentStage === 'COMPLETED') {
             colorClass = 'progress-dot success';
@@ -5645,13 +5645,13 @@
             return { activity: 'Belum Plan', notes: 'Menunggu pembuatan jadwal pemasangan.' };
           case 'PLAN':
             return { activity: 'Jadwal Dibuat', notes: `Rencana pasang: ${u.planDate} di ${u.lokasiPasang || '—'}.` };
-          case 'INSTALLATION':
+          case 'TEKNISI':
             return { activity: 'Instalasi Lapangan', notes: `Sedang dipasang oleh ${u.teknisiPelaksana || 'Teknisi'}.` };
-          case 'TEKNISI_SUBMITTED':
+          case 'PIC':
             return { activity: 'Verifikasi PIC', notes: `Instalasi selesai. Menunggu verifikasi PIC Lapangan (${u.picLapangan || '—'}).` };
-          case 'PIC_VERIFIED':
+          case 'IT':
             return { activity: 'Verifikasi IT', notes: 'Fisik OK. Menunggu verifikasi integrasi IT Puninar.' };
-          case 'IT_VERIFIED':
+          case 'CMT':
             return { activity: 'Verifikasi CMT', notes: 'Integrasi data OK. Menunggu verifikasi final CMT (Terminasi).' };
           case 'COMPLETED':
             return { activity: 'Migrasi Selesai', notes: 'Unit aktif penuh dan vendor lama sudah diterminasi.' };
@@ -7077,27 +7077,26 @@
       const workflowStages = [
         { name: 'UNPLAN', label: 'Unplan' },
         { name: 'PLAN', label: 'Plan' },
-        { name: 'INSTALLATION', label: 'Installing' },
-        { name: 'TEKNISI_SUBMITTED', label: 'Teknisi' },
-        { name: 'PIC_VERIFIED', label: 'PIC' },
-        { name: 'IT_VERIFIED', label: 'IT' },
+        { name: 'TEKNISI', label: 'Teknisi' },
+        { name: 'PIC', label: 'PIC' },
+        { name: 'IT', label: 'IT' },
         { name: 'CMT', label: 'CMT' },
         { name: 'COMPLETED', label: 'Done' }
       ];
 
       const getUnitCurrentStage = (u) => {
         if (u.statusPlan === 'UNPLAN') return 'UNPLAN';
-        if (u.statusPasang === 'ON PROGRESS') return 'INSTALLATION';
-        if (u.statusPasang === 'TEKNISI SUBMITTED') return 'TEKNISI_SUBMITTED';
-        if (u.statusPasang === 'PIC VERIFIED') return 'PIC_VERIFIED';
-        if (u.statusPasang === 'IT VERIFIED' || u.statusPasang === 'IT VERIFIKASI' || u.statusPasang === 'IT PENDING') return 'IT_VERIFIED';
+        if (u.statusPasang === 'ON PROGRESS') return 'TEKNISI';
+        if (u.statusPasang === 'TEKNISI SUBMITTED') return 'PIC';
+        if (u.statusPasang === 'PIC VERIFIED') return 'PIC';
+        if (u.statusPasang === 'IT VERIFIED' || u.statusPasang === 'IT VERIFIKASI' || u.statusPasang === 'IT PENDING') return 'IT';
         if (u.statusPasang === 'CMT PENDING') return 'CMT';
         if (u.statusPasang === 'DONE') return 'COMPLETED';
         return 'PLAN';
       };
 
       const getStageStatus = (currentStage, stageName) => {
-        const order = ['UNPLAN', 'PLAN', 'INSTALLATION', 'TEKNISI_SUBMITTED', 'PIC_VERIFIED', 'IT_VERIFIED', 'CMT', 'COMPLETED'];
+        const order = ['UNPLAN', 'PLAN', 'TEKNISI', 'PIC', 'IT', 'CMT', 'COMPLETED'];
         const currentIndex = order.indexOf(currentStage);
         const stageNameIndex = order.indexOf(stageName);
         if (currentIndex === stageNameIndex) return 'active';
@@ -7110,7 +7109,7 @@
         
         if (status === 'active') {
           let colorClass = 'progress-dot active';
-          if (currentStage === 'INSTALLATION' || currentStage === 'TEKNISI_SUBMITTED') {
+          if (currentStage === 'TEKNISI' || currentStage === 'PIC') {
             colorClass = 'progress-dot warning animate-pulse';
           } else if (currentStage === 'COMPLETED') {
             colorClass = 'progress-dot success';
@@ -7138,9 +7137,9 @@
             return { activity: 'Belum Plan', notes: 'Menunggu pembuatan jadwal pemasangan.' };
           case 'PLAN':
             return { activity: 'Jadwal Dibuat', notes: `Rencana pasang: ${u.planDate} di ${u.lokasiPasang || '—'}.` };
-          case 'INSTALLATION':
+          case 'TEKNISI':
             return { activity: 'Instalasi Lapangan', notes: `Sedang dipasang oleh ${u.teknisiPelaksana || 'Teknisi'}.` };
-          case 'TEKNISI_SUBMITTED':
+          case 'PIC':
             return { activity: 'Verifikasi PIC', notes: `Instalasi selesai. Menunggu verifikasi PIC Lapangan (${u.picLapangan || '—'}).` };
           case 'PIC_VERIFIED':
             return { activity: 'Verifikasi IT', notes: 'Fisik OK. Menunggu verifikasi integrasi IT Puninar.' };
@@ -7222,7 +7221,7 @@
                           {u.pool} • Site {u.location}
                         </div>
                       </div>
-                      <Badge val={currentStage === 'COMPLETED' ? 'DONE' : currentStage === 'INSTALLATION' ? 'ON PROGRESS' : currentStage} />
+                      <Badge val={u.statusPasang || (u.planDate ? 'PLAN' : 'UNPLAN')} />
                     </div>
 
                     <div style={{ marginTop: 10 }}>
@@ -7909,6 +7908,7 @@
         const ts = `${dd(now.getDate())}-${dd(now.getMonth() + 1)}-${now.getFullYear()} ${dd(now.getHours())}:${dd(now.getMinutes())}`;
 
         const updates = {
+          "STATUS REGISTRASI": 'TEKNISI SUBMITTED',
           "TIPE GPS BARU": modelGpsBaru,
           "TEKNISI PELAKSANA": nameMatch,
           "GPS": gps,
@@ -7933,6 +7933,7 @@
           setUnits(prev => prev.map(item => item.id === activeUnit.id ? {
             ...item,
             ...updates,
+            statusPasang: 'TEKNISI SUBMITTED',
             fotoOdometer: urlFotoOdometer,
             gpsSerialLama: noGpsLama,
             gpsSerialBaru: gpsSerialBaru,
